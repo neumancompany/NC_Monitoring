@@ -1,6 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using NC_Monitoring.Data.Models
+
 @model LoginViewModel
-@inject SignInManager<IdentityUser> SignInManager
+@inject SignInManager<ApplicationUser> SignInManager
 
 @{
     ViewData["Title"] = "Přihlášení";
