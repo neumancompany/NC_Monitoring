@@ -11,8 +11,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using NC_Monitoring.Business.Interfaces;
 using NC_Monitoring.Business.Managers;
+using NC_Monitoring.Data.Interfaces;
 using NC_Monitoring.Data.Models;
+using NC_Monitoring.Data.Repositories;
+using NC_Monitoring.Mapper;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.IO;
@@ -97,6 +101,9 @@ namespace NC_Monitoring
                 });
 
             services
+                .AddTransient<IChannelManager, ChannelManager>()
+                .AddTransient<IChannelRepository, ChannelRepository>();
+            services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
@@ -107,6 +114,8 @@ namespace NC_Monitoring
                     options.AccessDeniedPath = "/Account/AccessDenied";
                     options.SlidingExpiration = true;
                 });
+
+            MapperConfigure.Configure(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

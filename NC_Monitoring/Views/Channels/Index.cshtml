@@ -1,0 +1,28 @@
+﻿@model ChannelViewModel
+
+@{
+    ViewData["Title"] = "Channels";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@(Html.DevExtreme().DataGrid<ChannelViewModel>()
+        .DataSource(d => d.Mvc()
+                        .Controller<ChannelsController>()
+                        .LoadAction("Load")
+                        .InsertAction("Post")
+                        .UpdateAction("Put")
+                        .DeleteAction("Delete")
+                        .Key("Id"))
+        .Editing(e => e.AllowEditingByUser(User))
+        .Columns(col =>
+        {
+            col.AddFor(m => m.Name)
+                .CellTemplate(@Html.DxActionLink("<%= data.Name %>", "Details", new { Id = "<%= data.Id %>" }));
+
+            col.AddFor(m => m.ChannelTypeId)
+                .DataType(GridColumnDataType.Number)
+                .Lookup(lookup => lookup.ApplySelectList<ChannelsController>("TypesSelectList"));
+            //col.AddFor(m => m.VerificationValue);
+        })
+)

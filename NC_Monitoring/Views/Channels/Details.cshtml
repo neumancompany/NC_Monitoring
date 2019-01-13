@@ -1,0 +1,35 @@
+﻿@model ChannelViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@(Html.DevExtreme().DataGrid<ChannelSubscriberViewModel>()
+        .DataSource(d => d.Mvc()
+            .LoadAction("SubscriberLoad")
+            .LoadParams(new { ChannelId = Model.Id })
+            .InsertAction("SubscriberPost")
+            .UpdateAction("SubscriberPut")
+            .DeleteAction("SubscriberDelete")
+            .Key("Id"))
+        .Editing(e => e.AllowEditingByUser(User))
+        .OnInitNewRow("onInitNewRow")
+        .Columns(col =>
+        {
+            col.AddFor(m => m.UserId)
+            .Lookup(look => look.ApplySelectList("UserSelectList"));
+        }))
+
+<script>
+
+    function channelId() {
+        console.log(arguments);
+        return 1;
+    }
+
+    function onInitNewRow(item) {
+        item.data.ChannelId = @Model.Id;
+    }
+</script>

@@ -12,31 +12,54 @@
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link href="~/css/devextreme/dx.common.css" rel="stylesheet" />
-    <link href="~/css/devextreme/dx.light.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.min.css" />
+    @*<link rel="stylesheet" href="~/lib/glyphicons/styles/glyphicons.css" />*@
+    <link rel="stylesheet" href="~/lib/fontawesome/css/solid.min.css" />
+    <link rel="stylesheet" href="~/lib/fontawesome/css/fontawesome.min.css" />
+
+    @*<link href="~/vendor/devextreme/dist/css/dx.common.css" rel="stylesheet" />
+        <link href="~/vendor/devextreme/dist/css/dx.light.css" rel="stylesheet" />*@
+    <link href="~/lib/devextreme/css/dx.common.css" rel="stylesheet" />
+    <link href="~/lib/devextreme/css/dx.light.css" rel="stylesheet" />
+
+    @*<link href="~/css/devextreme/devextreme.custom.theme.css" rel="stylesheet" />*@
 
     <script src="~/lib/jquery/dist/jquery.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
 
-    <script src="~/js/devextreme/cldr.js"></script>
-    <script src="~/js/devextreme/cldr/event.js"></script>
-    <script src="~/js/devextreme/cldr/supplemental.js"></script>
-    <script src="~/js/devextreme/cldr/unresolved.js"></script>
+    @*<script src="~/lib/devextreme/js/"></script>
+        <script src="~/lib/cldrjs/src/event.js"></script>
+        <script src="~/lib/cldrjs/src/supplemental.js"></script>
+        <script src="~/lib/devextreme/js/devextreme/cldr/unresolved.js"></script>*@
 
-    <script src="~/js/devextreme/globalize.js"></script>
-    <script src="~/js/devextreme/globalize/message.js"></script>
-    <script src="~/js/devextreme/globalize/number.js"></script>
-    <script src="~/js/devextreme/globalize/currency.js"></script>
-    <script src="~/js/devextreme/globalize/date.js"></script>
+    @*<script src="~/lib/devextreme/js/devextreme/globalize.js"></script>*@
+    @*<script src="~/lib/globalize/src/message.js"></script>
+        <script src="~/lib/globalize/src/number.js"></script>
+        <script src="~/lib/globalize/src/currency.js"></script>
+        <script src="~/lib/globalize/src/date.js"></script>*@
 
     @* JSZip for client side export *@
     @*<script src="~/js/devextreme/jszip.js"></script>*@
-    
-    <script src="~/js/devextreme/dx.all.js"></script>
-    <script src="~/js/devextreme/vectormap-data/world.js"></script>
+
+    @*<script src="~/vendor/devextreme/dist/js/dx.all.js"></script>
+    <script src="~/vendor/devextreme/dist/js/vectormap-data/world.js"></script>
+    <script src="~/vendor/devextreme-aspnet-data/js/dx.aspnet.data.js"></script>
+    <script src="~/vendor/devextreme/aspnet.js"></script>*@
+
+    <script src="~/lib/devextreme/js/dx.all.js"></script>
+    <script src="~/lib/devextreme/js/vectormap-data/world.js"></script>
     <script src="~/lib/devextreme-aspnet-data/js/dx.aspnet.data.js"></script>
-    <script src="~/js/devextreme/aspnet/dx.aspnet.mvc.js"></script>
+    <script src="~/lib/devextreme/js/dx.aspnet.mvc.js"></script>
+
+    <script src="~/js/nc/nc.dx.defaultOptions.js"></script>
+
+    @*<script src="~/vendor/cldrjs/dist/cldr.js"></script>
+        <script src="~/vendor/cldrjs/dist/cldr/event.js"></script>
+        <script src="~/vendor/cldrjs/dist/cldr/supplemental.js"></script>
+        <script src="~/vendor/cldrjs/dist/cldr/unresolved.js"></script>
+
+        <script src="~/vendor/globalize/dist/globalize.js"></script>
+        <script src="~/vendor/globalize/dist/globalize/number.js"></script>*@
 
 </head>
 
@@ -51,12 +74,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/">NC_Monitoring</a>
+                <a class="navbar-brand" href="/">NC Monitoring</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li><a is-active-route href="#">Home</a></li>
-                    <li><a is-active-route href="#contact">Contact</a></li>
+                    @*<li><a is-active-route href="#">Home</a></li>*@
+                    <li><a asp-controller="Channels" asp-action="Index">Channels</a></li>
+                    @*<li><a is-active-route asp-controller="Home" asp-action="Contact">Contact</a></li>*@
                 </ul>
                 <partial name="_LoginPartial" />
             </div>
@@ -66,7 +90,9 @@
     <div class="container">
         @RenderBody()
     </div>
-	
+
+    <script src="~/js/NC/nc.functions.js"></script>
+
 	@RenderSection("Scripts", required: false)
 </body>
 
