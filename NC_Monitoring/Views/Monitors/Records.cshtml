@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "Records";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (User.IsAllowDeleting())
+{
+<div class="text-right">
+    @(Html.DevExtreme().Button().Text("Clear old records.").OnClick("clearOldRecords"))
+    @(Html.DevExtreme().Button().Text("Clear all records.").OnClick("clearRecords"))
+</div>
+}
+
+@(Html.DevExtreme().DataGrid<MonitorRecordListDTO>()
+    .ID("grdRecords")
+    .Editing(conf=> conf
+        .AllowAdding(false)
+        .AllowDeleting(false)
+        .AllowUpdating(false)
+        )
+    .DataSource(ds => ds.Mvc()
+        .Controller<MonitorsController>()
+        .LoadAction("RecordsLoad")
+        .Key("Id")
+    )
+    .RemoteOperations(x=>x.Paging(true).GroupPaging(true))
+    .Columns(columns => {
+
+        columns.AddFor(m => m.MonitorName)
+            .CellTemplate(@Html.DxActionLink("<%= data.MonitorName %>", "Details", "Monitors", new { Id = "<%= data.MonitorId %>" }));
+
+        columns.AddFor(m => m.StartDate)
+            .DataType(GridColumnDataType.DateTime);
+
+        columns.AddFor(m => m.EndDate)
+            .DataType(GridColumnDataType.DateTime);
+
+        columns.AddFor(m => m.Note);
+
+        columns.AddFor(m => m.GroupBy).GroupIndex(0).SortOrder(SortOrder.Desc);
+    })
+    //.Summary(conf => conf
+    //    .Texts(x =>
+    //    {
+    //        x.Count("Pocet");
+    //    })
+    //    .GroupItems(items =>
+    //        items.AddFor(x => x.GroupBy)
+    //        .SummaryType(SummaryType.Count)
+    //        //.CustomizeText("{0} cas")
+    //        .DisplayFormat("{0} pocet")
+    //        .Column(x => x.StartDate)
+    //        ))
+)
+<script>
+
+    function clearRecords() {
+        $.ajax({
+            url: '/api/records/clear',
+            method: 'delete',
+        }).done(function () {
+            $('#grdRecords').dxDataGrid('instance').refresh();
+        });
+    }
+    function clearOldRecords() {
+        $.ajax({
+            url: '/api/records/clear/old',
+            method: 'delete',
+        }).done(function () {
+            $('#grdRecords').dxDataGrid('instance').refresh();
+        });
+    }
+</script>

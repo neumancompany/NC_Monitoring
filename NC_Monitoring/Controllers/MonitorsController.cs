@@ -35,5 +35,11 @@ namespace NC_Monitoring.Controllers
         {
             return View();
         }
+
+        [HttpGet("records", Name = "MonitorRecords")]
+        public IActionResult Records()
+        {
+            return View();
+        }
     }
 }

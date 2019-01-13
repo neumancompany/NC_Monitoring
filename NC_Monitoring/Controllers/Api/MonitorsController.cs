@@ -44,5 +44,55 @@ namespace NC_Monitoring.Controllers.Api
             //return mapper.Map<List<ISelectItem<int>>>(repository.GetVerificationTypes());
             return DataSourceLoader.Load(repository.GetVerificationTypes().ToSelectList(x => x.Id, x => x.Name), loadOptions);
         }
+
+        #region "Records"
+
+        [Route("/api/records/load")]
+        public LoadResult RecordsLoad(DataSourceLoadOptions loadOptions)
+        {
+            return DataSourceLoader.Load(mapper.MapQueryable<MonitorRecordListDTO>(monitorManager.GetAllRecords().OrderByDescending(x => x.StartDate)), loadOptions);
+        }
+        [Route("/api/records/ForMonitorLoad", Name = "RecordsForMonitorLoad")]
+        public IEnumerable<MonitorRecordListDTO> RecordsForMonitorLoad(Guid monitorId)
+        {
+            return mapper.MapEnumerable<NcMonitorRecord, MonitorRecordListDTO>(monitorManager
+                .GetRecordsForMonitor(monitorId)
+                .OrderByDescending(x=>x.StartDate));
+        }
+
+
+        [HttpDelete("/api/records/clear/old/{monitorId}")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public IActionResult ClearOldRecordsForMonitor(Guid monitorId)
+        {
+            monitorManager.DeleteOldRecordsForMonitorAsync(monitorId).Wait();
+            return Ok();
+        }
+
+        [HttpDelete("/api/records/clear/{monitorId}")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public IActionResult ClearRecordsForMonitor(Guid monitorId)
+        {
+            monitorManager.DeleteRecordsForMonitorAsync(monitorId).Wait();
+            return Ok();
+        }
+
+        [HttpDelete("/api/records/clear/old")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public IActionResult ClearAllOldRecords()
+        {
+            monitorManager.DeleteOldRecordsAsync().Wait();
+            return Ok();
+        }
+
+        [HttpDelete("/api/records/clear")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public IActionResult ClearAllRecords()
+        {
+            monitorManager.DeleteRecordsAsync().Wait();
+            return Ok();
+        }
+
+        #endregion
     }
 }
