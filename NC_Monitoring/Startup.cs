@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using NC_Monitoring.Business.Managers;
 using NC_Monitoring.Data.Models;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -68,9 +69,9 @@ namespace NC_Monitoring
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 // .AddDefaultUI()//vytvoreni stranek pro prihlaseni /Ideneity/Account/Login atd.
                 .AddDefaultTokenProviders()
-                .AddUserManager<UserManager<ApplicationUser>>()
-                .AddRoleManager<RoleManager<ApplicationRole>>()
-                .AddSignInManager<SignInManager<ApplicationUser>>()
+                .AddUserManager<ApplicationUserManager>()
+                .AddRoleManager<ApplicationRoleManager>()
+                .AddSignInManager<ApplicationSignInManager>()
                 .AddRoles<ApplicationRole>();
 
             services

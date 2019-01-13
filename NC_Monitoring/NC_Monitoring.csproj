@@ -38,6 +38,7 @@
     <Folder Include="NC\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NC_Monitoring.Business\NC_Monitoring.Business.csproj" />
     <ProjectReference Include="..\NC_Monitoring.Data\NC_Monitoring.Data.csproj" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

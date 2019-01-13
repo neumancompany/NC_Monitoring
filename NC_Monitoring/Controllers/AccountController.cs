@@ -11,18 +11,19 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using NC_Monitoring.Data.Models;
+using NC_Monitoring.Business.Managers;
 
 namespace WebApplication2.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly ApplicationUserManager userManager;
+        private readonly ApplicationSignInManager signInManager;
 
         public AccountController
         (
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager
+            ApplicationUserManager userManager,
+            ApplicationSignInManager signInManager
         )
         {
             this.userManager = userManager;
