@@ -1,4 +1,6 @@
 ﻿using NC.AspNetCore.Attributes;
+using NC_Monitoring.Data.Enums;
+using NC_Monitoring.Data.Extensions;
 using NC_Monitoring.Data.Interfaces;
 using Newtonsoft.Json;
 using System;
@@ -66,5 +68,12 @@ namespace NC_Monitoring.Data.Models
         [Column("LastTestCycleInterval")]
         public TimeSpan? LastTestCycleInterval { get; set; }
         
+        public bool Enabled
+        {
+            get
+            {
+                return this.StatusEnum() != MonitorStatus.InActive;
+            }
+        }
     }
 }

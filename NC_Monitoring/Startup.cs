@@ -101,9 +101,13 @@ namespace NC_Monitoring
                 });
 
             services
+                .AddTransient<IMonitorRepository, MonitorRepository>()
+                .AddTransient<IMonitorManager, MonitorManager>()
+                
                 .AddTransient<IChannelManager, ChannelManager>()
                 .AddTransient<IChannelRepository, ChannelRepository>()
                 .AddTransient<IScenarioRepository, ScenarioRepository>();
+
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>

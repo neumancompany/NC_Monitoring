@@ -1,0 +1,53 @@
+﻿
+@{
+    ViewData["Title"] = "Monitors";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@(Html.DevExtreme().DataGrid<MonitorFormViewModel>()
+                .DataSource(d => d.Mvc()
+                    .Controller("Monitors")
+                    .LoadAction("Load")
+                    .InsertAction("Post")
+                    .UpdateAction("Put")
+                    .DeleteAction("Delete")
+                    .Key("Id"))
+                .Editing(e=>e.AllowEditingByUser(User))
+                .Columns(col =>
+                {
+                    col.AddFor(m => m.Name).CellTemplate(@Html.DxActionLink("<%= data.Name %>", "Details", new { Id = "<%= data.Id %>" }));
+
+                    col.AddFor(m => m.ScenarioId)
+                        .Lookup(look => look.ApplySelectList<ScenariosController>())
+                        .CellTemplate(
+                            Html.DxActionLink("<%= text %>", "Details", "Scenarios", new { Id = "<%= value %>" }));
+
+
+                    col.AddFor(m => m.StatusName)
+                        .FormItem(conf=>conf.Visible(false))
+                        ;
+
+                    col.AddFor(m => m.Enabled)
+                        .Visible(false);
+
+                    col.AddFor(m => m.MethodTypeId)
+                        .Lookup(look => look.ApplySelectList<MonitorsController>("MethodTypesSelectList"));
+
+                    col.AddFor(m => m.Url);
+
+                    col.AddFor(m => m.VerificationTypeId)
+                        .Lookup(look => look.ApplySelectList("VerificationTypesSelectList"));
+
+                    col.AddFor(m => m.VerificationValue);
+
+                    col.AddFor(m => m.Timeout)
+                        .FormItem(frm => frm
+                            .HelpText<MonitorFormViewModel>(x => x.Timeout)
+                            .Editor(formItem => formItem
+                                .DateBox()
+                                .PickerType(DateBoxPickerType.Rollers))
+                            );
+
+                })
+)

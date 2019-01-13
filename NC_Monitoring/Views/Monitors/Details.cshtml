@@ -1,0 +1,38 @@
+﻿@model MonitorDetailDTO
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Scenario</th>
+        <td><a asp-controller="Scenarios" asp-action="Details" asp-route-id="@Model.ScenarioId">@Model.ScenarioName</a></td>
+    </tr>
+    <tr>
+        <th>Status</th>
+        <td>@Model.StatusName</td>
+    </tr>
+    <tr>
+        <th>Method</th>
+        <td>@Model.MethodTypeName</td>
+    </tr>
+    <tr>
+        <th>Url</th>
+        <td><a href="@Model.Url" target="_blank">@Model.Url</a></td>
+    </tr>
+    <tr>
+        <th>Verification type</th>
+        <td>@Model.VerificationTypeName</td>
+    </tr>
+    <tr>
+        <th>Verification value</th>
+        <td>@Model.VerificationValue</td>
+    </tr>
+    <tr>
+        <th>Timeout</th>
+        <td>@Model.Timeout</td>
+    </tr>
+</table>

@@ -17,6 +17,15 @@ namespace NC_Monitoring.Mapper
         {
             services.AddAutoMapper(cfg =>
             {
+                cfg.CreateMap<MonitorFormViewModel, NcMonitor>()
+                    .ForMember(x => x.StatusId, m => m.MapFrom(x => (int)(x.Enabled ? MonitorStatus.OK : MonitorStatus.InActive)))
+                    .ForMember(x => x.Enabled, m => m.Ignore())
+                    ;
+                cfg.CreateMap<NcMonitor, MonitorFormViewModel>()
+                    //.ForMember(x => x.StatusName, m => m.MapFrom(x => x.Status.Name))
+                    ;
+                cfg.CreateMap<NcMonitor, MonitorDetailDTO>();
+                
                 cfg.CreateMap<NcScenario, ScenarioViewModel>();
                 cfg.CreateMap<ScenarioViewModel, NcScenario>();
 
@@ -26,6 +35,7 @@ namespace NC_Monitoring.Mapper
 
                 cfg.CreateMap<NcChannel, ChannelViewModel>();
                 cfg.CreateMap<ChannelViewModel, NcChannel>();
+                
             });
         }
 
