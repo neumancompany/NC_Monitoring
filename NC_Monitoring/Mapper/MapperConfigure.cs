@@ -17,6 +17,13 @@ namespace NC_Monitoring.Mapper
         {
             services.AddAutoMapper(cfg =>
             {
+                cfg.CreateMap<NcScenario, ScenarioViewModel>();
+                cfg.CreateMap<ScenarioViewModel, NcScenario>();
+
+                cfg.CreateMap<NcScenarioItem, ScenarioItemViewModel>();
+                cfg.CreateMap<ScenarioItemViewModel, NcScenarioItem>();
+
+
                 cfg.CreateMap<NcChannel, ChannelViewModel>();
                 cfg.CreateMap<ChannelViewModel, NcChannel>();
             });

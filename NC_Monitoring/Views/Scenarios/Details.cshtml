@@ -1,0 +1,48 @@
+﻿@model ScenarioDetailViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h2>Channels</h2>
+
+@{
+    var scenarioId = ViewContext.RouteData.Values["id"];
+    var grid = Html.DevExtreme().DataGrid<ScenarioItemViewModel>()
+        .OnInitNewRow("onInitNewRow")
+        .DataSource(d => d.Mvc()
+            .Controller<ScenariosController>()
+            .LoadAction("ItemsLoad")
+            .LoadParams(new { Id = scenarioId })
+            .InsertAction("ItemsPost")
+            .UpdateAction("ItemsPut")
+            .DeleteAction("ItemsDelete")
+            .Key("Id")
+        )
+        .Editing(e => e.AllowEditingByUser(User))
+        .Columns(col =>
+        {
+            col.AddFor(m => m.ChannelId).Lookup(lookup => lookup.ApplySelectList<ChannelsController>())
+                .CellTemplate(@Html.DxActionLink(
+                    "<%= displayValue %>", "Details", "Channels", new { Id = "<%= value %>" }));
+
+            //col.AddFor(m => m.ChannelId)
+            //    .CellTemplate(@Html.ActionLink("NAME_PLACEHOLDER", "Details", new { Id = "ID_PLACEHOLDER" })
+            //        .ToHtmlString()
+            //        .Replace("NAME_PLACEHOLDER", "<%= data.TestCycleCount + data.TestCycleCount %>")
+            //        .Replace("ID_PLACEHOLDER", "<%= data.ChannelId %>"));
+
+            col.AddFor(m => m.TestCycleInterval).FormItem(frm => frm
+                        .HelpText<ScenarioItemViewModel>(x => x.TestCycleInterval));
+        });
+
+    @grid
+}
+
+<script>
+    function onInitNewRow(item) {
+        item.data.ScenarioId = @scenarioId;
+    }
+</script>

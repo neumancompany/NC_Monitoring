@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewData["Title"] = "Scenarios";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@{
+    var grid = Html.DevExtreme().DataGrid<ScenarioViewModel>()
+        .DataSource(d => d.Mvc()
+            .Controller("Scenarios")
+            .LoadAction("Load")
+            .InsertAction("Post")
+            .UpdateAction("Put")
+            .DeleteAction("Delete")
+            .Key("Id"))
+        .Editing(e => e.AllowEditingByUser(User))
+        .Columns(col =>
+        {
+            col.AddFor(m => m.Name)
+                .CellTemplate(@Html.ActionLink("NAME_PLACEHOLDER", "Details", new { Id = "ID_PLACEHOLDER" })
+                    .ToHtmlString()
+                    .Replace("NAME_PLACEHOLDER", "<%= data.Name %>")
+                    .Replace("ID_PLACEHOLDER", "<%= data.Id %>"));
+        });
+
+@grid
+}
