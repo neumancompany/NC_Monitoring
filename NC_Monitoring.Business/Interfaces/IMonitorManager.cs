@@ -13,6 +13,8 @@ namespace NC_Monitoring.Business.Interfaces
     {
 
         NcMonitor FindMonitor(Guid id);
+        
+        List<NcMonitor> MonitorsToCheck();
 
         #region "Records"
 

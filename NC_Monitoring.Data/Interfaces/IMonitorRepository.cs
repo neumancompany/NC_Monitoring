@@ -10,5 +10,7 @@ namespace NC_Monitoring.Data.Interfaces
         List<NcMonitorStatusType> GetStatusTypes();
         List<NcMonitorMethodType> GetMethodTypes();
         List<NcMonitorVerificationType> GetVerificationTypes();
+
+        List<NcMonitor> MonitorsToCheck();
     }
 }

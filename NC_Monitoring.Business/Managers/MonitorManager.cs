@@ -37,6 +37,11 @@ namespace NC_Monitoring.Business.Managers
         {
             return monitorRepository.FindById(id);
         }
+
+        public List<NcMonitor> MonitorsToCheck()
+        {
+            return monitorRepository.MonitorsToCheck();
+        }
         
         #region "Records"
 

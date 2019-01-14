@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NC_Monitoring.Data", "NC_Mo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NC_Monitoring.Business", "NC_Monitoring.Business\NC_Monitoring.Business.csproj", "{D8058C9C-86BC-4F50-B188-9A494E4A635A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NC_Monitoring.ConsoleApp", "NC_Monitoring.Console\NC_Monitoring.ConsoleApp.csproj", "{5648FB37-7713-4245-BA8D-6639B27BF140}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D8058C9C-86BC-4F50-B188-9A494E4A635A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8058C9C-86BC-4F50-B188-9A494E4A635A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8058C9C-86BC-4F50-B188-9A494E4A635A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5648FB37-7713-4245-BA8D-6639B27BF140}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5648FB37-7713-4245-BA8D-6639B27BF140}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5648FB37-7713-4245-BA8D-6639B27BF140}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5648FB37-7713-4245-BA8D-6639B27BF140}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

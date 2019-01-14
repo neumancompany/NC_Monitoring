@@ -18,7 +18,7 @@ namespace NC_Monitoring.Data.Repositories
         {
             this.mapper = mapper;
         }
-
+        
         public List<NcMonitorMethodType> GetMethodTypes()
         {
             return context.NcMonitorMethodType.ToList();
@@ -33,6 +33,10 @@ namespace NC_Monitoring.Data.Repositories
         {
             return context.NcMonitorVerificationType.ToList();
         }
-        
+
+        public List<NcMonitor> MonitorsToCheck()
+        {
+            return context.NcMonitor.Where(x => x.Enabled).ToList();
+        }
     }
 }
