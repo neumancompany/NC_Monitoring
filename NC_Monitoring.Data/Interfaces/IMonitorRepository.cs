@@ -12,5 +12,12 @@ namespace NC_Monitoring.Data.Interfaces
         List<NcMonitorVerificationType> GetVerificationTypes();
 
         List<NcMonitor> MonitorsToCheck();
+
+        /// <summary>
+        /// Aktulizuje monitor bez restartu intervalu testovaciho cyklu.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task UpdateAsyncWithoutResetTestCycleInterval(NcMonitor entity);
     }
 }

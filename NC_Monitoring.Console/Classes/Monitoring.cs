@@ -16,11 +16,12 @@ namespace NC_Monitoring.ConsoleApp.Classes
     public class Monitoring
     {
         private readonly ILogger<Monitoring> logger;
+        private readonly MonitorRecorder monitorRecorder;
         private readonly IMonitorManager monitorManager;
-
-        public Monitoring(ILogger<Monitoring> logger, IMonitorManager monitorManager)
+        public Monitoring(ILogger<Monitoring> logger, MonitorRecorder monitorRecorder, IMonitorManager monitorManager)
         {
             this.logger = logger;
+            this.monitorRecorder = monitorRecorder;
             this.monitorManager = monitorManager;
         }
 
@@ -32,12 +33,7 @@ namespace NC_Monitoring.ConsoleApp.Classes
             {
                 try
                 {
-                    MonitorResult result = CheckMonitor(monitor);
-
-                    if (!result.IsSuccess)
-                    {
-                        Console.WriteLine($"Error: {monitor.Name} - {result.Message}");
-                    }                    
+                    CheckAndRecordMonitorAsync(monitor).Wait();
                 }
                 catch (Exception ex)
                 {
@@ -45,6 +41,13 @@ namespace NC_Monitoring.ConsoleApp.Classes
                 }
 
             }
+        }
+
+        private Task CheckAndRecordMonitorAsync(NcMonitor monitor)
+        {
+            var result = CheckMonitor(monitor);
+
+            return monitorRecorder.RecordAsync(monitor, result);
         }
 
         private MonitorResult CheckMonitor(NcMonitor monitor)
@@ -152,7 +155,8 @@ namespace NC_Monitoring.ConsoleApp.Classes
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
-            request.Timeout = timeout;            
+            request.Timeout = timeout;
+            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;//pro https
 
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
             {
@@ -170,7 +174,7 @@ namespace NC_Monitoring.ConsoleApp.Classes
                         {
                             readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet));
                         }
-                        
+
                         return readStream.ReadToEnd();
                     }
                 }

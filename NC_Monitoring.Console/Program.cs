@@ -56,6 +56,8 @@ namespace NC_Monitoring.ConsoleApp
 
             services
                 .AddTransient<Monitoring>()
+                .AddTransient<MonitorRecorder>()
+
                 .AddTransient<IMonitorManager, MonitorManager>()
                 .AddTransient<IMonitorRepository, MonitorRepository>()
                 .AddTransient<IChannelRepository, ChannelRepository>()                

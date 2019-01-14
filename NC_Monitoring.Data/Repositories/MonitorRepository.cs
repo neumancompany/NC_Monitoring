@@ -18,7 +18,44 @@ namespace NC_Monitoring.Data.Repositories
         {
             this.mapper = mapper;
         }
-        
+
+        public async Task UpdateAsyncWithoutResetTestCycleInterval(NcMonitor entity)
+        {
+            await UpdateInternalAsync(entity, resetTestCycleIfChangeStatus: false);
+        }
+
+        public override async Task UpdateAsync(NcMonitor entity)
+        {
+            await UpdateInternalAsync(entity, resetTestCycleIfChangeStatus: true);
+        }
+
+        private async Task UpdateInternalAsync(NcMonitor entity, bool resetTestCycleIfChangeStatus)
+        {
+            var foundEntity = await dbSet.FindAsync(entity.Id);
+
+            if (resetTestCycleIfChangeStatus && foundEntity != null)
+            {
+                if (foundEntity.StatusId != entity.StatusId)
+                {//zmena statusu
+                    entity.LastTestCycleInterval = null;
+                }
+            }
+
+            //mapper.Map(entity, foundEntity);
+
+            foundEntity.MethodTypeId = entity.MethodTypeId;
+            foundEntity.StatusId = entity.StatusId;
+            foundEntity.ScenarioId = entity.ScenarioId;
+            foundEntity.VerificationTypeId = entity.VerificationTypeId;
+            foundEntity.VerificationValue = entity.VerificationValue;
+            foundEntity.Name = entity.Name;
+            foundEntity.Timeout = entity.Timeout;
+            foundEntity.Url = entity.Url;
+            foundEntity.LastTestCycleInterval = entity.LastTestCycleInterval;
+
+            await base.UpdateAsync(foundEntity);
+        }
+
         public List<NcMonitorMethodType> GetMethodTypes()
         {
             return context.NcMonitorMethodType.ToList();

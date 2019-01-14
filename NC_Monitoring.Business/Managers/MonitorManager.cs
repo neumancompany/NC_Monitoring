@@ -31,8 +31,8 @@ namespace NC_Monitoring.Business.Managers
             this.monitorRepository = monitorRepository;
             this.recordRepository = recordRepository;
             this.scenarioRepository = scenarioRepository;
-        }
-        
+        }        
+
         public NcMonitor FindMonitor(Guid id)
         {
             return monitorRepository.FindById(id);
@@ -42,7 +42,14 @@ namespace NC_Monitoring.Business.Managers
         {
             return monitorRepository.MonitorsToCheck();
         }
-        
+
+        public async Task SetStatusAndResetLastTestCycleIntervalAsync(NcMonitor monitor, MonitorStatus status)
+        {
+            monitor.StatusId = (int)status;
+            monitor.LastTestCycleInterval = null;
+            await monitorRepository.UpdateAsync(monitor);
+        }
+
         #region "Records"
 
         public TimeSpan? TimeInErrorStatus(Guid monitorId)
