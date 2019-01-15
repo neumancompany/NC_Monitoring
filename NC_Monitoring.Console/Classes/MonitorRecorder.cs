@@ -17,10 +17,13 @@ namespace NC_Monitoring.ConsoleApp.Classes
         private readonly ILogger<MonitorRecorder> logger;
         private readonly IMonitorManager monitorManager;
 
-        public MonitorRecorder(ILogger<MonitorRecorder> logger, IMonitorManager monitorManager)
+        private readonly Notificator notificator;
+
+        public MonitorRecorder(ILogger<MonitorRecorder> logger, IMonitorManager monitorManager, Notificator notificator)
         {
             this.logger = logger;
             this.monitorManager = monitorManager;
+            this.notificator = notificator;
         }
 
         public async Task RecordAsync(NcMonitor monitor, MonitorResult result)
@@ -35,7 +38,8 @@ namespace NC_Monitoring.ConsoleApp.Classes
                     {
                         await monitorManager.UpdateEndDateAsync(record, DateTime.Now);
                     }
-                    
+
+                    await notificator.AddNotifyUpAsync(monitor);//poslani notifikace o tom ze web bezi, staci poslat pouze jendou.
                     await monitorManager.SetStatusAndResetLastTestCycleIntervalAsync(monitor, MonitorStatus.OK);
                 }
             }
@@ -46,6 +50,9 @@ namespace NC_Monitoring.ConsoleApp.Classes
                     await monitorManager.SetStatusAndResetLastTestCycleIntervalAsync(monitor, MonitorStatus.Error);
                     await AddNewRecordAsync(monitor, result);
                 }
+
+                //posilani notifikaci se provadi stale dokud je monitor v chybovem stavu
+                await notificator.AddNotifyDownAsync(monitor);
             }
         }
 

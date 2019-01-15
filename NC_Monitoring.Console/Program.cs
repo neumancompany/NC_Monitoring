@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NC_Monitoring.Business.Classes;
 using NC_Monitoring.Business.Interfaces;
 using NC_Monitoring.Business.Managers;
 using NC_Monitoring.ConsoleApp.Classes;
@@ -64,7 +67,25 @@ namespace NC_Monitoring.ConsoleApp
                 .AddTransient<IRecordRepository, RecordRepository>()
                 .AddTransient<IScenarioRepository, ScenarioRepository>();
 
-        serviceProvider = services
+            services
+                .AddTransient<QueueProvider>()
+                .AddTransient<Notificator>()
+                .AddTransient<EmailNotificator>();
+
+            services.AddScoped<SmtpClient>(conf =>
+            {
+                return new SmtpClient()
+                {
+                    Host = Configuration.GetValue<string>("Email:Smtp:Host"),
+                    Port = Configuration.GetValue<int>("Email:Smtp:Port"),
+                    Credentials = new NetworkCredential(
+                        Configuration.GetValue<string>("Email:Smtp:Username"),
+                        Configuration.GetValue<string>("Email:Smtp:Password")
+                    )
+                };
+            });
+
+            serviceProvider = services
                 .BuildServiceProvider();
 
             logger = serviceProvider.GetService<ILoggerFactory>()
@@ -83,7 +104,10 @@ namespace NC_Monitoring.ConsoleApp
         {
             try
             {
-                TimeSpan interval = TimeSpan.FromSeconds(5);
+                if (!TimeSpan.TryParse(Configuration["MonitoringInterval"], out TimeSpan interval))
+                {
+                    interval = TimeSpan.FromMinutes(2);
+                }
 
                 while (true)
                 {
@@ -96,6 +120,8 @@ namespace NC_Monitoring.ConsoleApp
                             serviceProvider
                                 .GetService<Monitoring>()
                                 .CheckMonitors(serviceProvider);
+
+                            await serviceProvider.GetService<Notificator>().SendAllNotifications();
                         }
                     }
                     catch (Exception ex)

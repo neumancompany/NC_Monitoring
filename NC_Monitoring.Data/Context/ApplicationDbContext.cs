@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NC_Monitoring.Data.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -21,12 +23,18 @@ namespace NC_Monitoring.Data.Models
         public virtual DbSet<NcMonitorVerificationType> NcMonitorVerificationType { get; set; }
         public virtual DbSet<NcScenario> NcScenario { get; set; }
         public virtual DbSet<NcScenarioItem> NcScenarioItem { get; set; }
-        
+
+        public virtual DbSet<NcQueue> NcQueue { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.HasDefaultSchema(schema: DBGlobals.SchemaName);
 
-            base.OnModelCreating(modelBuilder);            
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<NcQueue>()
+                .Property(e => e.Type)
+                .HasConversion(new EnumToStringConverter<QueueType>());
 
             //SEED
             modelBuilder.Entity<NcChannelType>().HasData(

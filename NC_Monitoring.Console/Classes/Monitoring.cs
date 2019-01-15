@@ -18,11 +18,13 @@ namespace NC_Monitoring.ConsoleApp.Classes
         private readonly ILogger<Monitoring> logger;
         private readonly MonitorRecorder monitorRecorder;
         private readonly IMonitorManager monitorManager;
-        public Monitoring(ILogger<Monitoring> logger, MonitorRecorder monitorRecorder, IMonitorManager monitorManager)
+        private readonly Notificator notificator;
+        public Monitoring(ILogger<Monitoring> logger, MonitorRecorder monitorRecorder, IMonitorManager monitorManager, Notificator notificator)
         {
             this.logger = logger;
             this.monitorRecorder = monitorRecorder;
             this.monitorManager = monitorManager;
+            this.notificator = notificator;
         }
 
         public void CheckMonitors(IServiceProvider serviceProvider)
@@ -34,6 +36,8 @@ namespace NC_Monitoring.ConsoleApp.Classes
                 try
                 {
                     CheckAndRecordMonitorAsync(monitor).Wait();
+
+                    notificator.SendAllNotifications().Wait();
                 }
                 catch (Exception ex)
                 {

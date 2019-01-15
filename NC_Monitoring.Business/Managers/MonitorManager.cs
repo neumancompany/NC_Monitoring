@@ -31,7 +31,14 @@ namespace NC_Monitoring.Business.Managers
             this.monitorRepository = monitorRepository;
             this.recordRepository = recordRepository;
             this.scenarioRepository = scenarioRepository;
-        }        
+        }
+
+        private List<ApplicationUser> GetUsersByChannel(int channelId)
+        {
+            return channelRepository.GetSubscribersByChannel(channelId)
+                        .Select(x => x.User).ToList();
+        }
+        
 
         public NcMonitor FindMonitor(Guid id)
         {
@@ -48,6 +55,35 @@ namespace NC_Monitoring.Business.Managers
             monitor.StatusId = (int)status;
             monitor.LastTestCycleInterval = null;
             await monitorRepository.UpdateAsync(monitor);
+        }
+
+        public List<NcChannel> GetChannelsToLastCycleTest(NcMonitor monitor)
+        {
+            return scenarioRepository
+                .GetItems(monitor.ScenarioId)
+                .Where(x => x.TestCycleInterval <= monitor.LastTestCycleInterval)
+                .Select(x=>x.Channel).ToList();
+        }
+
+        public List<NcChannel> GetChannelsBetweenLastErrorAndTestCycle(NcMonitor monitor, TimeSpan testCycle)
+        {
+            if (testCycle.TotalHours >= 24)
+            {
+                testCycle = new TimeSpan(23, 59, 59);
+            }
+            return scenarioRepository
+                .GetItems(monitor.ScenarioId)
+                .Where(x =>
+                    (monitor.LastTestCycleInterval == null //monitor jeste nebyl testovan
+                        || monitor.LastTestCycleInterval < x.TestCycleInterval )//nebo posledni testovaci cyklus monitoru je mensi nez testovaci cyklus aktualniho kanalu
+                    && x.TestCycleInterval <= testCycle)//a zaroven testovaci cyklus kanalu musi byt mensi nebo roven testovacimu cyklu ve vstupnim parametru
+                .Select(x => x.Channel).ToList();
+        }
+
+        public async Task SetLastTestCycleIntervalsAsync(NcMonitor monitor, TimeSpan? timeSpan)
+        {
+            monitor.LastTestCycleInterval = timeSpan;
+            await monitorRepository.UpdateAsyncWithoutResetTestCycleInterval(monitor);
         }
 
         #region "Records"

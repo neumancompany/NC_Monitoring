@@ -14,9 +14,4 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.4" />
     <PackageReference Include="NC.AspNetCore" Version="1.0.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Classes\" />
-    <Folder Include="Migrations\" />
-  </ItemGroup>
 </Project>
