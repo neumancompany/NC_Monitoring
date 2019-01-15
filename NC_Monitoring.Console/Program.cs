@@ -55,7 +55,12 @@ namespace NC_Monitoring.ConsoleApp
 
             services.AddAutoMapper();
 
-            services.AddLogging(conf => { conf.AddLog4Net(); });
+            services.AddLogging((logging) =>
+            {
+                logging.AddConfiguration(Configuration.GetSection("Logging"));
+                logging.AddConsole();
+                logging.AddLog4Net();
+            });
 
             services
                 .AddTransient<Monitoring>()
