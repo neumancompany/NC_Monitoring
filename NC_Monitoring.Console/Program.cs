@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -68,7 +66,7 @@ namespace NC_Monitoring.ConsoleApp
 
                 .AddTransient<IMonitorManager, MonitorManager>()
                 .AddTransient<IMonitorRepository, MonitorRepository>()
-                .AddTransient<IChannelRepository, ChannelRepository>()                
+                .AddTransient<IChannelRepository, ChannelRepository>()
                 .AddTransient<IRecordRepository, RecordRepository>()
                 .AddTransient<IScenarioRepository, ScenarioRepository>();
 
@@ -111,22 +109,24 @@ namespace NC_Monitoring.ConsoleApp
             {
                 if (!TimeSpan.TryParse(Configuration["MonitoringInterval"], out TimeSpan interval))
                 {
-                    interval = TimeSpan.FromMinutes(2);
+                    //pokud neni nastaven interval v configu, tak se nastavi na 1 minutu
+                    interval = TimeSpan.FromMinutes(1);
                 }
 
                 while (true)
                 {
                     try
                     {
-                        using (var scope = serviceProvider.CreateScope())
+                        //v kazdem novem cyklu si vytvorime novy scope,
+                        //aby se nam aktualizoval DBContext, napr. pokud se DB
+                        //aktualizuje z venci (administrace), tak zde by se to neprojevilo
+                        using (IServiceScope scope = serviceProvider.CreateScope())
                         {
-                            var serviceProvider = scope.ServiceProvider;
+                            Monitoring monitoring = scope.ServiceProvider.GetService<Monitoring>();
 
-                            serviceProvider
-                                .GetService<Monitoring>()
-                                .CheckMonitors(serviceProvider);
+                            monitoring.CheckMonitors(serviceProvider);
 
-                            await serviceProvider.GetService<Notificator>().SendAllNotifications();
+                            await scope.ServiceProvider.GetService<Notificator>().SendAllNotifications();
                         }
                     }
                     catch (Exception ex)

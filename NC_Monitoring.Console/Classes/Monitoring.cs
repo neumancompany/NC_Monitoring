@@ -35,9 +35,30 @@ namespace NC_Monitoring.ConsoleApp.Classes
             {
                 try
                 {
-                    CheckAndRecordMonitorAsync(monitor).Wait();
+                    Task.Run(async () =>
+                    {//kontroly jednotlivych monitoru spustime paralelne
+                        try
+                        {
+                            //vytvoreni noveho scope, jelikoz kazde vlakno by melo mit vlastni scope
+                            //muze se totiz stat, ze se napr. databazovi context uvolni
+                            //a vlakno se na nej bude chtit stale dotazovat
+                            using (IServiceScope scope = serviceProvider.CreateScope())
+                            {
+                                Monitoring monitoring = scope.ServiceProvider.GetService<Monitoring>();
 
-                    notificator.SendAllNotifications().Wait();
+                                //vyhledani monitoru v aktualnim scope (db contextu)
+                                NcMonitor tmpMonitor = monitoring.monitorManager.FindMonitor(monitor.Id);
+
+                                await monitoring.CheckAndRecordMonitorAsync(tmpMonitor);
+                                await monitoring.notificator.SendAllNotifications();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, $"Error while checking monitor: {monitor.Id} - {monitor.Name}.");
+                        }
+
+                    });
                 }
                 catch (Exception ex)
                 {
