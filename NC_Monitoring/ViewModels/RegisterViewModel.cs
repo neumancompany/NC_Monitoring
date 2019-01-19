@@ -5,24 +5,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NC_Monitoring.Models.Authentication
+namespace NC_Monitoring.ViewModels
 {
     public class RegisterViewModel
     {
         [Required]
-        [EmailAddress(ErrorMessage = "Neplatná emailová adresa")]
+        [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "{0} musí mít délku alespoň {2} a nejvíc {1} znaků.", MinimumLength = 6)]
+        [StringLength(100, MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Heslo")]
+        [Display(Name = "Password")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Potvrzení hesla")]
-        [Compare("Password", ErrorMessage = "Zadaná hesla se musí shodovat.")]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "Passwords have to match.")]
         public string ConfirmPassword { get; set; }
     }
 }

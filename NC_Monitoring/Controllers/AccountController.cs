@@ -1,22 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using NC_Monitoring.Controllers;
-using NC_Monitoring.Models.Authentication;
 using NC.AspNetCore.Filters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using NC_Monitoring.Data.Models;
 using NC_Monitoring.Business.Managers;
+using NC_Monitoring.Data.Enums;
+using NC_Monitoring.Data.Models;
 using NC_Monitoring.ViewModels;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace WebApplication2.Controllers
+namespace NC_Monitoring.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private readonly ApplicationUserManager userManager;
         private readonly ApplicationSignInManager signInManager;
@@ -31,7 +26,7 @@ namespace WebApplication2.Controllers
             this.signInManager = signInManager;
         }
 
-        [HttpGet]        
+        [HttpGet("Login")]
         [AllowAnonymous]
         [AllowAnonymousOnly]
         public IActionResult Login(string returnUrl = null)
@@ -40,7 +35,7 @@ namespace WebApplication2.Controllers
             return View();
         }
 
-        [HttpPost]        
+        [HttpPost("Login")]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string navratovaURL = null)
@@ -55,7 +50,7 @@ namespace WebApplication2.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Neplatné přihlašovací údaje.");
+                    ModelState.AddModelError(string.Empty, "Incorect credentials.");
                     return View(model);
                 }
             }
@@ -63,7 +58,7 @@ namespace WebApplication2.Controllers
             return View(model);
         }
 
-        [HttpPost]        
+        [HttpPost("Logout")]
         [ValidateAntiForgeryToken]
         [Authorize]
         public async Task<IActionResult> Logout()
@@ -72,29 +67,63 @@ namespace WebApplication2.Controllers
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        [AllowAnonymousOnly]
-        public IActionResult Register(string returnUrl = null)
+        [HttpGet("Create")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public IActionResult Create()
         {
-            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
             return View();
         }
 
         [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]                  
-        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            ViewData["ReturnUrl"] = returnUrl;
+            if (!TryValidateModel(model))
+            {
+                return BadRequest(ModelState.GetFullErrorMessage());
+            }
+
+            if (model.CurrentPassword == model.Password)
+            {
+                return BadRequest("New password is same as old password.");
+            }
+
+            ApplicationUser user = await userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return BadRequest("User was not found.");
+            }
+
+            IdentityResult result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.Password);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(string.Join(", ", result.Errors.Select(x => x.Description)));
+            }
+
+            return Ok("Password was changed.");
+        }
+
+        [HttpPost("Create")]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public async Task<IActionResult> Create(RegisterViewModel model)
+        {
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 var result = await userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToLocal(returnUrl);
+                    return Redirect(Request.Path.Value);
                 }
 
                 foreach (var error in result.Errors)
@@ -106,7 +135,7 @@ namespace WebApplication2.Controllers
             return View(model);
         }
 
-        [HttpGet]
+        [HttpGet("AccessDenied")]
         public IActionResult AccessDenied()
         {
             return View();

@@ -1,0 +1,44 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Create user";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@using (Html.BeginForm("Create", "Account", FormMethod.Post))//new { id = "editEmployee" }
+{
+
+    @Html.ValidationSummary()
+
+    using (Html.DevExtreme().ValidationGroup())
+    {
+        @(Html.DevExtreme().Form<RegisterViewModel>()
+            .ShowValidationSummary(true)
+            .FormData(Model)
+            .Items(formItems =>
+            {
+                formItems.AddSimpleFor(x=>x.Email)
+                    .IsRequired(true);
+
+                formItems.AddSimpleFor( x=>x.Password)
+                    .Editor(e => e.TextBox().Mode(TextBoxMode.Password))
+                    .IsRequired(true);
+                formItems.AddSimpleFor(x=>x.ConfirmPassword)
+                    .Editor(e => e.TextBox().Mode(TextBoxMode.Password))
+                    .IsRequired(true);
+            })
+
+                //.ValidationGroup("login")
+        )
+
+        @(Html.DevExtreme().Button()
+            .Text("Create user")
+            //.ValidationGroup("login")
+            .UseSubmitBehavior(true)
+        )
+    }
+}
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
