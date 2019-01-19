@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NC_Monitoring.Data.Models;
 using NC_Monitoring.Business.Managers;
+using NC_Monitoring.ViewModels;
 
 namespace WebApplication2.Controllers
 {

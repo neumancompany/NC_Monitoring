@@ -5,20 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NC_Monitoring.Models.Authentication
+namespace NC_Monitoring.ViewModels
 {
     public class LoginViewModel
     {
         [Required]
-        [EmailAddress(ErrorMessage = "Neplatná emailová adresa")]
+        [EmailAddress]
         public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
-        [Display(Name = "Heslo")]
+        [Display]
         public string Password { get; set; }
 
-        [Display(Name = "Pamatuj si mě")]
+        [Display]
         public bool RememberMe { get; set; }
     }
 }
