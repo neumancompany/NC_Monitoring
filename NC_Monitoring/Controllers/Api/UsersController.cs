@@ -30,13 +30,15 @@ namespace NC_Monitoring.Controllers.Api
 
         private readonly ApplicationUserManager userManager;
         private readonly ApplicationRoleManager roleManager;
-        private readonly IMapper mapper;        
+        private readonly IMapper mapper;
+        private readonly EmailNotificator emailNotificator;
 
-        public UsersController(ApplicationUserManager userManager, ApplicationRoleManager roleManager, IMapper mapper)
+        public UsersController(ApplicationUserManager userManager, ApplicationRoleManager roleManager, IMapper mapper, EmailNotificator emailNotificator)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
-            this.mapper = mapper;            
+            this.mapper = mapper;
+            this.emailNotificator = emailNotificator;
         }
 
         [HttpGet]
@@ -73,6 +75,39 @@ namespace NC_Monitoring.Controllers.Api
             }
 
             return users;
+        }
+
+        [HttpPut]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public async Task<IActionResult> ResetPassword(Guid key)
+        {
+            ApplicationUser foundUser = await userManager.FindByIdAsync(key);
+
+            if (foundUser == null)
+            {
+                return BadRequest("User was not found.");
+            }
+
+            ApplicationUser currentUser = await userManager.GetUserAsync(User);
+
+            if (foundUser.GlobalAdmin && !currentUser.GlobalAdmin)
+            {
+                return Forbid();
+            }
+
+            string newPassword = Guid.NewGuid().ToString().Replace("-", "");
+
+            IdentityResult result = await userManager.ResetPasswordAsync(foundUser, await userManager.GeneratePasswordResetTokenAsync(foundUser), newPassword);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest("Reset password failed.");
+            }
+
+            await emailNotificator.SendEmailAsync(foundUser.Email, "Reset password",
+                $"Your password was reset.\n\nUserName: {foundUser.UserName}\nNew password: {newPassword}");
+
+            return Ok($"New password was send to email. ({foundUser.Email})");
         }
 
         [HttpPut]

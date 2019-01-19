@@ -33,12 +33,33 @@
             .Buttons(b => {
                 b.Add().Name(GridColumnButtonName.Delete);
                 b.Add().Name(GridColumnButtonName.Edit);
+                b.Add()
+                    .Icon("fas fa-unlock-alt")
+                    .Hint("Reset password")
+                    .Visible(new JS("isShowResetPassword"))
+                    .OnClick(@<text>resetPassword</text>);
                 });
 
     }))
 
 <script>
-    
+
+    function isShowResetPassword(e) {
+        return e.row.data.AllowResetPassword;
+    }
+
+    function resetPassword(e) {
+        $.ajax({
+            url: '/api/users/resetpassword',
+            method: 'put',
+            data: "key=" + e.row.data.Id,
+        }).done(function (output) {
+            NCNotifySuccess(output);
+        }).fail(function (xhr) {
+            NCNotifyError(xhr.responseText);
+        });
+    }
+
     function allowDeleting(e) {
         return e.row.data.AllowDeleting;
     }

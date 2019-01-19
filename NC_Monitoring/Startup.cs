@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NC_Monitoring.Business.Classes;
 using NC_Monitoring.Business.Interfaces;
 using NC_Monitoring.Business.Managers;
 using NC_Monitoring.Data.Interfaces;
@@ -18,6 +19,8 @@ using NC_Monitoring.Mapper;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.IO;
+using System.Net;
+using System.Net.Mail;
 
 namespace NC_Monitoring
 {
@@ -106,6 +109,21 @@ namespace NC_Monitoring
                 .AddTransient<IChannelRepository, ChannelRepository>()
 
                 .AddTransient<IScenarioRepository, ScenarioRepository>();
+            
+            services
+                .AddTransient<EmailNotificator>()
+                .AddScoped<SmtpClient>(conf =>
+                {
+                    return new SmtpClient()
+                    {
+                        Host = Configuration.GetValue<string>("Email:Smtp:Host"),
+                        Port = Configuration.GetValue<int>("Email:Smtp:Port"),
+                        Credentials = new NetworkCredential(
+                            Configuration.GetValue<string>("Email:Smtp:Username"),
+                            Configuration.GetValue<string>("Email:Smtp:Password")
+                        )
+                    };
+                });
 
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
