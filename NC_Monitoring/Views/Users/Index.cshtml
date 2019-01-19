@@ -1,0 +1,49 @@
+﻿@using NC_Monitoring.Data.Models
+
+<h1>Users</h1>
+
+@(Html.DevExtreme().DataGrid<UserViewModel>()
+    .ID("grdUsers")
+    .DataSource(d=>d.Mvc()
+        .Controller<UsersController>
+    ()
+    .LoadAction("Load")
+    .UpdateAction("Put")
+    .DeleteAction("Delete")
+    .Key("Id")
+    )
+    //.OnCellPrepared("cellPrepared")
+    .Editing(e=>e
+        .AllowEditingByUser(User)
+        .AllowAdding(false)
+        .AllowUpdating(new JS("allowEditing"))
+        .AllowDeleting(new JS("allowDeleting")))
+    .Columns(col =>
+    {
+        col.AddFor(x => x.UserName);
+
+        col.AddFor(x => x.RoleName)
+            .Lookup(d=>d.ApplySelectList("RolesSelectList"));
+
+        col.AddFor(x => x.GlobalAdmin).FormItem(frm=>frm.Visible(false));
+
+        col.Add()
+            .Type(GridCommandColumnType.Buttons)
+            .Width(110)
+            .Buttons(b => {
+                b.Add().Name(GridColumnButtonName.Delete);
+                b.Add().Name(GridColumnButtonName.Edit);
+                });
+
+    }))
+
+<script>
+    
+    function allowDeleting(e) {
+        return e.row.data.AllowDeleting;
+    }
+
+    function allowEditing(e) {
+        return e.row.data.AllowEditing;
+    }
+</script>
