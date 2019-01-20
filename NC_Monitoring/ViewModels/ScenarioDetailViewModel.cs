@@ -13,5 +13,7 @@ namespace NC_Monitoring.ViewModels
         public int Id { get; set; }
 
         public string Name { get; set; }
+
+        public List<MonitorListDTO> Monitors { get; set; }
     }
 }

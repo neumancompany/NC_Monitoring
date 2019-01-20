@@ -28,7 +28,11 @@ namespace NC_Monitoring.Mapper
 
                 cfg.CreateMap<NcMonitorRecord, MonitorRecordListDTO>()
                     .ForMember(x => x.GroupBy, m => m.MapFrom(x => x.StartDate.Date));
-                                
+
+
+                cfg.CreateMap<NcScenario, ScenarioDetailViewModel>()
+                    .ForMember(x => x.Monitors, m => m.Ignore());
+
                 cfg.CreateMap<NcScenario, ScenarioViewModel>();
                 cfg.CreateMap<ScenarioViewModel, NcScenario>();
 

@@ -39,6 +39,8 @@ namespace NC_Monitoring.Controllers
         {
             ScenarioDetailViewModel model = mapper.Map<ScenarioDetailViewModel>(scenarioRepository.FindById(id));
 
+            model.Monitors = mapper.MapEnumerable<MonitorListDTO>(scenarioRepository.GetMonitors(id)).ToList();
+
             return View(model);
         }
     }

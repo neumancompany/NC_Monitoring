@@ -41,6 +41,25 @@
     @grid
 }
 
+<h2>Monitors</h2>
+
+@if (Model.Monitors.Count == 0)
+{
+    <div class="alert alert-info">The scenario is not yet assigned to any monitor.</div>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var monitor in Model.Monitors)
+        {
+            <li class="list-group-item">
+                <a asp-controller="Monitors" asp-action="Details" asp-route-id="@monitor.Id">@monitor.Name</a>
+            </li>
+
+        }
+    </ul>
+}
+
 <script>
     function onInitNewRow(item) {
         item.data.ScenarioId = @scenarioId;
