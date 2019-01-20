@@ -44,6 +44,6 @@ namespace NC_Monitoring.Business.Interfaces
         NcChannelSubscriber FindSubscriberById(int key);
         Task SubscriberUpdateAsync(NcChannelSubscriber entity);
         Task SubscriberDeleteAsync(int key);
-        
+        IQueryable<NcScenario> GetScenariosByChannelId(int id);
     }
 }

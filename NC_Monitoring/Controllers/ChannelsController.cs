@@ -37,7 +37,9 @@ namespace NC_Monitoring.Controllers
         public IActionResult Details(int id)
         {
             var channel = channelManager.FindById(id);
-            ChannelViewModel model = mapper.Map<ChannelViewModel>(channel);            
+            ChannelViewModel model = mapper.Map<ChannelViewModel>(channel);
+
+            model.Scenarios = mapper.MapEnumerable<NcScenario, ScenarioListDTO>(channelManager.GetScenariosByChannelId(channel.Id)).ToList();
 
             return View(model);
         }

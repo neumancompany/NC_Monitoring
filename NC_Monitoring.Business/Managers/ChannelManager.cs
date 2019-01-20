@@ -13,10 +13,12 @@ namespace NC_Monitoring.Business.Managers
     public class ChannelManager : IChannelManager
     {
         private readonly IChannelRepository channelRepository;
+        private readonly IScenarioRepository scenarioRepository;
 
-        public ChannelManager(IChannelRepository channelRepository)
+        public ChannelManager(IChannelRepository channelRepository, IScenarioRepository scenarioRepository)
         {
             this.channelRepository = channelRepository;
+            this.scenarioRepository = scenarioRepository;
         }
 
         public List<NcChannelType> GetChannelTypes()
@@ -63,6 +65,9 @@ namespace NC_Monitoring.Business.Managers
         {
             return channelRepository.GetUsersNotAssignedToTheChannelYet(channelId);
         }
-
+        public IQueryable<NcScenario> GetScenariosByChannelId(int id)
+        {
+            return scenarioRepository.GetScenariosByChannelId(id);
+        }
     }
 }

@@ -17,6 +17,8 @@ namespace NC_Monitoring.ViewModels
         [Display(Name = "Notification provider")]
         public int ChannelTypeId { get; set; }
 
+        public ICollection<ScenarioListDTO> Scenarios { get; set; }
+
         //public ICollection<NcScenarioItem> NcScenarioItem { get; set; }
     }
 }

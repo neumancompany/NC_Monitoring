@@ -22,13 +22,32 @@
             .Lookup(look => look.ApplySelectList("UserSelectList"));
         }))
 
+<h2>Scenarios</h2>
+
+@if (Model.Scenarios.Count == 0)
+{
+    <div class="alert alert-info">The channel is not yet assigned to any scenario.</div>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var scenario in Model.Scenarios)
+        {
+            <li class="list-group-item">
+                <a asp-controller="Scenarios" asp-action="Details" asp-route-id="@scenario.Id">@scenario.Name</a>
+            </li>
+
+        }
+    </ul>
+}
+
 <script>
 
     function channelId() {
         console.log(arguments);
         return 1;
     }
-
+    
     function onInitNewRow(item) {
         item.data.ChannelId = @Model.Id;
     }
