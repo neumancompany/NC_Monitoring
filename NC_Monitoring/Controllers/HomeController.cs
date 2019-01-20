@@ -10,8 +10,8 @@ namespace NC_Monitoring.Controllers
     {
         public IActionResult Index()
         {
-            return View();
-        }
-
+            return new RedirectToActionResult(null, "Monitors", null);
+            //return View();
+        }        
     }
 }
