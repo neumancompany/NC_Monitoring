@@ -38,15 +38,15 @@ namespace NC_Monitoring.Controllers
         [HttpPost("Login")]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel model, string navratovaURL = null)
+        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = navratovaURL;
+            ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
                 var vysledekOvereni = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (vysledekOvereni.Succeeded)
                 {
-                    return RedirectToLocal(navratovaURL);
+                    return RedirectToLocal(returnUrl);
                 }
                 else
                 {
