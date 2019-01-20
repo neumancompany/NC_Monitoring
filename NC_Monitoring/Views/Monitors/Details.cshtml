@@ -36,3 +36,70 @@
         <td>@Model.Timeout</td>
     </tr>
 </table>
+
+<h2>Records</h2>
+
+@if(User.IsAllowDeleting())
+{
+<div class="text-right">
+    @(Html.DevExtreme().Button().Text("Clear old records.").OnClick("clearOldRecords"))
+    @(Html.DevExtreme().Button().Text("Clear all records.").OnClick("clearRecords"))
+</div>
+}
+
+@(Html.DevExtreme().DataGrid<MonitorRecordViewModel>()
+        .ID("grdRecords")
+            .Editing(e => e.AllowAdding(false).AllowDeleting(false).AllowUpdating(false))
+            .DataSource(ds => ds.Mvc()
+                .Controller<MonitorsController>()
+                .RouteName("RecordsForMonitorLoad")
+                .LoadParams(new
+                {
+                    monitorId = Model.Id,
+                })
+                .Key("Id")
+            )
+            .Columns(columns =>
+            {
+                columns.AddFor(m => m.StartDate)
+                    .DataType(GridColumnDataType.DateTime);
+
+                columns.AddFor(m => m.EndDate)
+                    .DataType(GridColumnDataType.DateTime);
+
+                columns.AddFor(m => m.Note);
+
+                columns.AddFor(m => m.GroupBy)
+                    .SortOrder(SortOrder.Desc)
+                    .GroupIndex(0);
+            })
+            //.SortByGroupSummaryInfo(i => i.Add().SummaryItem("blbo"))
+            .Summary(s => s.GroupItems(items =>
+            {
+                items.AddFor(m => m.Note)
+                    .SummaryType(SummaryType.Count)
+                    //.CustomizeText("Muj text")
+                    .DisplayFormat("{0} orders")
+                    .ValueFormat(Format.ShortDate)
+                    .Column(x => x.GroupBy);
+            }))
+)
+
+<script>
+    function clearRecords() {
+        $.ajax({
+            url: '/api/records/clear/@Model.Id',
+            method: 'delete',
+        }).done(function () {
+            $('#grdRecords').dxDataGrid('instance').refresh();
+        });
+    }
+    function clearOldRecords() {
+        $.ajax({
+            url: '/api/records/clear/old/@Model.Id',
+            method: 'delete',
+        }).done(function () {
+            $('#grdRecords').dxDataGrid('instance').refresh();
+        });
+    }
+</script>
