@@ -65,9 +65,9 @@ namespace NC_Monitoring.Business.Managers
         {
             return channelRepository.GetUsersNotAssignedToTheChannelYet(channelId);
         }
-        public IQueryable<NcScenario> GetScenariosByChannelId(int id)
+        public List<NcScenario> GetScenariosByChannelId(int id)
         {
-            return scenarioRepository.GetScenariosByChannelId(id);
+            return scenarioRepository.GetScenariosByChannelId(id).ToList();
         }
     }
 }

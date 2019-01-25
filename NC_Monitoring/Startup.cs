@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -59,6 +60,8 @@ namespace NC_Monitoring
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSession();
+
+            services.AddAutoMapper(cfg => MapperConfigure.Configure(cfg));
 
             services
                 .AddDbContext<ApplicationDbContext>(options => options
@@ -136,8 +139,6 @@ namespace NC_Monitoring
                     options.AccessDeniedPath = "/Account/AccessDenied";
                     options.SlidingExpiration = true;
                 });
-
-            MapperConfigure.Configure(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

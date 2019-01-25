@@ -1,18 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using NC.AspNetCore.Extensions;
+using NC_Monitoring.Controllers.Base;
 using NC_Monitoring.Data.Enums;
-using NC_Monitoring.Data.Exceptions;
+using NC_Monitoring.Data.Extensions;
 using NC_Monitoring.Data.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using NC_Monitoring.Data.Extensions;
-using NC_Monitoring.Controllers.Base;
-using Microsoft.AspNetCore.Authorization;
 
 namespace NC_Monitoring.Controllers.Api
 {

@@ -13,39 +13,36 @@ namespace NC_Monitoring.Mapper
 {
     public static class MapperConfigure
     {
-        public static void Configure(IServiceCollection services)
+        public static void Configure(IMapperConfigurationExpression cfg)
         {
-            services.AddAutoMapper(cfg =>
-            {
-                cfg.CreateMap<MonitorFormViewModel, NcMonitor>()
+            cfg.CreateMap<MonitorFormViewModel, NcMonitor>()
                     .ForMember(x => x.StatusId, m => m.MapFrom(x => (int)(x.Enabled ? MonitorStatus.OK : MonitorStatus.InActive)))
                     .ForMember(x => x.Enabled, m => m.Ignore())
                     ;
-                cfg.CreateMap<NcMonitor, MonitorFormViewModel>()
-                    //.ForMember(x => x.StatusName, m => m.MapFrom(x => x.Status.Name))
-                    ;
-                cfg.CreateMap<NcMonitor, MonitorDetailDTO>();
+            cfg.CreateMap<NcMonitor, MonitorFormViewModel>()
+                //.ForMember(x => x.StatusName, m => m.MapFrom(x => x.Status.Name))
+                ;
+            cfg.CreateMap<NcMonitor, MonitorDetailDTO>();
 
-                cfg.CreateMap<NcMonitorRecord, MonitorRecordListDTO>()
-                    .ForMember(x => x.GroupBy, m => m.MapFrom(x => x.StartDate.Date));
-
-
-                cfg.CreateMap<NcScenario, ScenarioDetailViewModel>()
-                    .ForMember(x => x.Monitors, m => m.Ignore());
-
-                cfg.CreateMap<NcScenario, ScenarioViewModel>();
-                cfg.CreateMap<ScenarioViewModel, NcScenario>();
-
-                cfg.CreateMap<NcScenarioItem, ScenarioItemViewModel>();
-                cfg.CreateMap<ScenarioItemViewModel, NcScenarioItem>();
+            cfg.CreateMap<NcMonitorRecord, MonitorRecordListDTO>()
+                .ForMember(x => x.GroupBy, m => m.MapFrom(x => x.StartDate.Date));
 
 
-                cfg.CreateMap<NcChannel, ChannelViewModel>();
-                cfg.CreateMap<ChannelViewModel, NcChannel>();
+            cfg.CreateMap<NcScenario, ScenarioDetailViewModel>()
+                .ForMember(x => x.Monitors, m => m.Ignore());
 
-                cfg.CreateMap<ApplicationUser, UserViewModel>()
-                    .ForMember(s => s.RoleName, m => m.Ignore());
-            });
+            cfg.CreateMap<NcScenario, ScenarioViewModel>();
+            cfg.CreateMap<ScenarioViewModel, NcScenario>();
+
+            cfg.CreateMap<NcScenarioItem, ScenarioItemViewModel>();
+            cfg.CreateMap<ScenarioItemViewModel, NcScenarioItem>();
+
+
+            cfg.CreateMap<NcChannel, ChannelViewModel>();
+            cfg.CreateMap<ChannelViewModel, NcChannel>();
+
+            cfg.CreateMap<ApplicationUser, UserViewModel>()
+                .ForMember(s => s.RoleName, m => m.Ignore());
         }
 
         private static void MapSelectItem<TSource, TKey>(this IMapperConfigurationExpression mapper, Expression<Func<TSource, TKey>> value, Expression<Func<TSource, string>> text)
