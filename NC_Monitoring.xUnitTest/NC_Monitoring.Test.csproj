@@ -21,4 +21,8 @@
     <ProjectReference Include="..\NC_Monitoring\NC_Monitoring.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DbContext\" />
+  </ItemGroup>
+
 </Project>

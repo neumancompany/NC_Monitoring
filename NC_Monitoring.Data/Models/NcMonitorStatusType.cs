@@ -21,6 +21,6 @@ namespace NC_Monitoring.Data.Models
         public string Name { get; set; }
 
         [InverseProperty("Status")]
-        public virtual ICollection<NcMonitor> NcMonitor { get; set; }
+        public virtual ICollection<NcMonitor> NcMonitor { get; set; }        
     }
 }
