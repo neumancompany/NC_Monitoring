@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "NC_Monitoring.ConsoleApp": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "development"
+      }
+    }
+  }
+}

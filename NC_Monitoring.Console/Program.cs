@@ -7,6 +7,7 @@ using NC_Monitoring.Business.Classes;
 using NC_Monitoring.Business.Interfaces;
 using NC_Monitoring.Business.Managers;
 using NC_Monitoring.ConsoleApp.Classes;
+using NC_Monitoring.ConsoleApp.Interfaces;
 using NC_Monitoring.Data.Interfaces;
 using NC_Monitoring.Data.Models;
 using NC_Monitoring.Data.Repositories;
@@ -62,7 +63,7 @@ namespace NC_Monitoring.ConsoleApp
 
             services
                 .AddTransient<Monitoring>()
-                .AddTransient<MonitorRecorder>()
+                .AddTransient<IMonitorRecorder, MonitorRecorder>()
 
                 .AddTransient<IMonitorManager, MonitorManager>()
                 .AddTransient<IMonitorRepository, MonitorRepository>()
@@ -71,9 +72,9 @@ namespace NC_Monitoring.ConsoleApp
                 .AddTransient<IScenarioRepository, ScenarioRepository>();
 
             services
-                .AddTransient<QueueProvider>()
-                .AddTransient<Notificator>()
-                .AddTransient<EmailNotificator>();
+                .AddTransient<IQueueProvider, QueueProvider>()
+                .AddTransient<INotificator, Notificator>()
+                .AddTransient<IEmailNotificator, EmailNotificator>();
 
             services.AddScoped<SmtpClient>(conf =>
             {
@@ -126,7 +127,7 @@ namespace NC_Monitoring.ConsoleApp
 
                             monitoring.CheckMonitors(serviceProvider);
 
-                            await scope.ServiceProvider.GetService<Notificator>().SendAllNotifications();
+                            await scope.ServiceProvider.GetService<INotificator>().SendAllNotifications();
                         }
                     }
                     catch (Exception ex)

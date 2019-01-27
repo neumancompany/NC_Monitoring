@@ -2,6 +2,7 @@
 using NC_Monitoring.Business.Classes;
 using NC_Monitoring.Business.Interfaces;
 using NC_Monitoring.Business.Managers;
+using NC_Monitoring.ConsoleApp.Interfaces;
 using NC_Monitoring.Data.Enums;
 using NC_Monitoring.Data.Extensions;
 using NC_Monitoring.Data.Models;
@@ -15,13 +16,13 @@ using System.Threading.Tasks;
 
 namespace NC_Monitoring.ConsoleApp.Classes
 {
-    public class Notificator
+    public class Notificator : INotificator
     {
         private readonly IMonitorManager monitorManager;
         private readonly ApplicationUserManager applicationUserManager;
-        private readonly EmailNotificator emailNotificator;
+        private readonly IEmailNotificator emailNotificator;
 
-        private readonly QueueProvider queue;
+        private readonly IQueueProvider queue;
         private readonly ILogger<Notificator> logger;
 
         class NotifyItem
@@ -33,8 +34,7 @@ namespace NC_Monitoring.ConsoleApp.Classes
             public string Contact { get; set; }
         }
 
-
-        public Notificator(IMonitorManager monitorManager, ApplicationUserManager applicationUserManager, EmailNotificator emailNotificator, QueueProvider queue, ILogger<Notificator> logger)
+        public Notificator(IMonitorManager monitorManager, ApplicationUserManager applicationUserManager, IEmailNotificator emailNotificator, IQueueProvider queue, ILogger<Notificator> logger)
         {
             this.monitorManager = monitorManager;
             this.applicationUserManager = applicationUserManager;
@@ -42,6 +42,8 @@ namespace NC_Monitoring.ConsoleApp.Classes
             this.queue = queue;
             this.logger = logger;
         }
+
+
 
         /// <summary>
         /// Prida notifikaci o nahozeni do fronty.

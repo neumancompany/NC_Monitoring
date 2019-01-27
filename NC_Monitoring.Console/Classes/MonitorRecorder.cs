@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using NC_Monitoring.Business.Interfaces;
+using NC_Monitoring.ConsoleApp.Interfaces;
 using NC_Monitoring.Data.Enums;
 using NC_Monitoring.Data.Extensions;
 using NC_Monitoring.Data.Models;
@@ -12,14 +13,13 @@ using System.Threading.Tasks;
 
 namespace NC_Monitoring.ConsoleApp.Classes
 {
-    public class MonitorRecorder
+    public class MonitorRecorder : IMonitorRecorder
     {
         private readonly ILogger<MonitorRecorder> logger;
         private readonly IMonitorManager monitorManager;
+        private readonly INotificator notificator;
 
-        private readonly Notificator notificator;
-
-        public MonitorRecorder(ILogger<MonitorRecorder> logger, IMonitorManager monitorManager, Notificator notificator)
+        public MonitorRecorder(ILogger<MonitorRecorder> logger, IMonitorManager monitorManager, INotificator notificator)
         {
             this.logger = logger;
             this.monitorManager = monitorManager;

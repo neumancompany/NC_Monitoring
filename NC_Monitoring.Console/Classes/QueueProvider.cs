@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using NC_Monitoring.ConsoleApp.Interfaces;
 using NC_Monitoring.Data.Enums;
 using NC_Monitoring.Data.Models;
 using Newtonsoft.Json;
@@ -11,7 +12,7 @@ namespace NC_Monitoring.ConsoleApp.Classes
     /// <summary>
     /// Prace s frontou v databazi.
     /// </summary>
-    public class QueueProvider
+    public class QueueProvider : IQueueProvider
     {
         private const string PARAMS_SEPARATOR = ";";
 

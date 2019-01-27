@@ -4,22 +4,25 @@ using NC_Monitoring.Business.Interfaces;
 using NC_Monitoring.Data.Enums;
 using NC_Monitoring.Data.Extensions;
 using NC_Monitoring.Data.Models;
+using NC_Monitoring.ConsoleApp.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using NC_Monitoring.ConsoleApp.Interfaces;
 
 namespace NC_Monitoring.ConsoleApp.Classes
 {
     public class Monitoring
     {
         private readonly ILogger<Monitoring> logger;
-        private readonly MonitorRecorder monitorRecorder;
+        private readonly IMonitorRecorder monitorRecorder;
         private readonly IMonitorManager monitorManager;
-        private readonly Notificator notificator;
-        public Monitoring(ILogger<Monitoring> logger, MonitorRecorder monitorRecorder, IMonitorManager monitorManager, Notificator notificator)
+        private readonly INotificator notificator;
+
+        public Monitoring(ILogger<Monitoring> logger, IMonitorRecorder monitorRecorder, IMonitorManager monitorManager, INotificator notificator)
         {
             this.logger = logger;
             this.monitorRecorder = monitorRecorder;

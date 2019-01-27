@@ -114,7 +114,7 @@ namespace NC_Monitoring
                 .AddTransient<IScenarioRepository, ScenarioRepository>();
             
             services
-                .AddTransient<EmailNotificator>()
+                .AddTransient<IEmailNotificator, EmailNotificator>()
                 .AddScoped<SmtpClient>(conf =>
                 {
                     return new SmtpClient()

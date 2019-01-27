@@ -31,9 +31,9 @@ namespace NC_Monitoring.Controllers.Api
         private readonly ApplicationUserManager userManager;
         private readonly ApplicationRoleManager roleManager;
         private readonly IMapper mapper;
-        private readonly EmailNotificator emailNotificator;
+        private readonly IEmailNotificator emailNotificator;
 
-        public UsersController(ApplicationUserManager userManager, ApplicationRoleManager roleManager, IMapper mapper, EmailNotificator emailNotificator)
+        public UsersController(ApplicationUserManager userManager, ApplicationRoleManager roleManager, IMapper mapper, IEmailNotificator emailNotificator)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;

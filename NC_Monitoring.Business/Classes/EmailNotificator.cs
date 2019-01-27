@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NC_Monitoring.Business.Interfaces;
 using NC_Monitoring.Data.Models;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace NC_Monitoring.Business.Classes
 {
-    public class EmailNotificator : IDisposable
+    public class EmailNotificator : IDisposable, IEmailNotificator
     {
         private readonly SmtpClient smtpClient;
         private readonly ILogger<EmailNotificator> logger;
@@ -39,11 +40,6 @@ namespace NC_Monitoring.Business.Classes
                 await smtpClient.SendMailAsync(mailMsg);
                 logger.LogInformation($"SendEmail: To=[{emailTo}] Subject[{subject}] Message=[{message}]");
             }
-        }
-
-        public void SendEmails(string[] emailsTo, string subject, string message)
-        {
-            throw new NotImplementedException();
         }
     }
 }
