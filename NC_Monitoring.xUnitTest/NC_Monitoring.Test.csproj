@@ -18,11 +18,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NC_Monitoring.Business\NC_Monitoring.Business.csproj" />
+    <ProjectReference Include="..\NC_Monitoring.Console\NC_Monitoring.ConsoleApp.csproj" />
     <ProjectReference Include="..\NC_Monitoring\NC_Monitoring.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DbContext\" />
   </ItemGroup>
 
 </Project>
