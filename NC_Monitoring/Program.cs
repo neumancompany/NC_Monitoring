@@ -23,7 +23,7 @@ namespace NC_Monitoring
                 try
                 {
                     // Requires using RazorPagesMovie.Models;
-                    SeedData.Initialize(services);
+                    
                 }
                 catch (Exception ex)
                 {

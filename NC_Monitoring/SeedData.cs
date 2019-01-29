@@ -53,8 +53,8 @@ namespace NC_Monitoring
 
         private static void SeedUsers(UserManager<ApplicationUser> userManager)
         {
-            userManager.AddUser("admin@admin.cz", "Heslo1*", nameof(UserRole.Admin));
-            userManager.AddUser("user@user.cz", "Heslo1*", nameof(UserRole.User));
+            userManager.AddUser("admin@admin.cz", "admin", nameof(UserRole.Admin));
+            userManager.AddUser("user@user.cz", "user", nameof(UserRole.User));
         }
 
         private static bool AddRole(this RoleManager<ApplicationRole> roleManager, string roleName)

@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NC_Monitoring.Data.Enums;
 using System;
-using System.Collections.Generic;
 
 namespace NC_Monitoring.Data.Models
 {
@@ -28,24 +27,15 @@ namespace NC_Monitoring.Data.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.HasDefaultSchema(schema: DBGlobals.SchemaName);
-
-            base.OnModelCreating(modelBuilder);
-
             modelBuilder.Entity<NcQueue>()
                 .Property(e => e.Type)
                 .HasConversion(new EnumToStringConverter<QueueType>());
 
             //SEED
-            modelBuilder.Entity<NcChannelType>().HasData(
-                //new NcChannelType
-                //{
-                //    Id = 1,
-                //    Name = "SMS"
-                //},
+            modelBuilder.Entity<NcChannelType>().HasData(                
                 new NcChannelType
                 {
-                    Id = 2,
+                    Id = (int)ChannelType.Email,
                     Name = "Email",
                 }
             );
@@ -61,17 +51,17 @@ namespace NC_Monitoring.Data.Models
             modelBuilder.Entity<NcMonitorStatusType>().HasData(
                 new NcMonitorStatusType
                 {
-                    Id = 1,
+                    Id = (int)MonitorStatus.OK,
                     Name = "OK"
                 },
                 new NcMonitorStatusType
                 {
-                    Id = 2,
+                    Id = (int)MonitorStatus.InActive,
                     Name = "In active",
                 },
                 new NcMonitorStatusType
                 {
-                    Id = 3,
+                    Id = (int)MonitorStatus.Error,
                     Name = "Error",
                 }
             );
@@ -79,16 +69,87 @@ namespace NC_Monitoring.Data.Models
             modelBuilder.Entity<NcMonitorVerificationType>().HasData(
                 new NcMonitorVerificationType
                 {
-                    Id = 1,
+                    Id = (int)MonitorVerification.StatusCode,
                     Name = "Status code"
                 },
                 new NcMonitorVerificationType
                 {
-                    Id = 2,
+                    Id = (int)MonitorVerification.Keyword,
                     Name = "Keyword"
                 }
             );
 
+            // plnění testovacích dat
+
+            modelBuilder.Entity<NcChannel>().HasData(
+                new NcChannel { Id = 1, Name = "Podpora" },
+                new NcChannel { Id = 2, Name = "Správci" }
+            );
+
+            //modelBuilder.Entity<NcChannelSubscriber>().HasData(
+            //    // nelze ziskat ID uzivatele, jelikoz je to GUID a vytvori se az pri inicializaci DB
+            //    //new NcChannelSubscriber { Id = 1, , UserId = 1, ChannelId = 1 },
+            //    //new NcChannelSubscriber { Id = 2, UserId = 1, ChannelId = 1 } 
+            //);
+
+            modelBuilder.Entity<NcScenario>().HasData(
+                new NcScenario { Id = 1, Name = "Scénář 1" },
+                new NcScenario { Id = 2, Name = "Scénář 2" }
+            );
+
+            modelBuilder.Entity<NcScenarioItem>().HasData(
+                new NcScenarioItem
+                {
+                    Id = 1,
+                    ChannelId = 1,
+                    TestCycleInterval = TimeSpan.Zero
+                },
+                new NcScenarioItem
+                {
+                    Id = 2,
+                    ChannelId = 2,
+                    TestCycleInterval = new TimeSpan(0, 10, 0), // upozorneni po 10 min vypadku
+                }
+            );
+
+            modelBuilder.Entity<NcMonitor>().HasData(
+                new NcMonitor
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Seznam - kontrola status code",
+                    MethodTypeId = 1,
+                    VerificationTypeId = (int)MonitorVerification.StatusCode,
+                    VerificationValue = "200",
+                    Timeout = new TimeSpan(0, 1, 0), // 1 min.
+                    Url = "https://seznam.cz",
+                    ScenarioId = 1,
+                },
+                new NcMonitor
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Google - kontrola keyword",
+                    MethodTypeId = 1,
+                    VerificationTypeId = (int)MonitorVerification.Keyword,
+                    VerificationValue = "Google",
+                    Timeout = new TimeSpan(0, 1, 0), // 1 min.
+                    Url = "https://google.com",
+                    ScenarioId = 1,
+                },
+                new NcMonitor
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Facebook - kontrola keyword",
+                    MethodTypeId = 1,
+                    VerificationTypeId = (int)MonitorVerification.Keyword,
+                    VerificationValue = "facebook",
+                    Timeout = new TimeSpan(0, 1, 0), // 1 min.
+                    Url = "https://facebook.com",
+                    ScenarioId = 2,
+                }
+            );
+
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 

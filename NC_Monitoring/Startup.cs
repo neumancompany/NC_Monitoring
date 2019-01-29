@@ -186,6 +186,8 @@ namespace NC_Monitoring
                 var services = serviceScope.ServiceProvider;
                 var context = services.GetRequiredService<ApplicationDbContext>();
                 context.Database.Migrate();
+
+                SeedData.Initialize(services);
             }
         }
     }
