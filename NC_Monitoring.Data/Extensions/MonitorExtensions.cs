@@ -19,5 +19,10 @@ namespace NC_Monitoring.Data.Extensions
         {
             return (MonitorStatus)monitor.StatusId;
         }
+
+        public static bool Enabled(this NcMonitor monitor)
+        {
+            return monitor.StatusEnum() != MonitorStatus.InActive;
+        }
     }
 }

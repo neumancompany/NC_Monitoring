@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using NC_Monitoring.Data.Extensions;
 using NC_Monitoring.Data.Interfaces;
 using NC_Monitoring.Data.Models;
 using Newtonsoft.Json;
@@ -73,7 +74,7 @@ namespace NC_Monitoring.Data.Repositories
 
         public List<NcMonitor> MonitorsToCheck()
         {
-            return context.NcMonitor.Where(x => x.Enabled).ToList();
+            return context.NcMonitor.Where(x => x.Enabled()).ToList();
         }
     }
 }

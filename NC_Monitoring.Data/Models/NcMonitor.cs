@@ -29,7 +29,7 @@ namespace NC_Monitoring.Data.Models
         public int StatusId { get; set; }
 
         [Column("MethodTypeID")]
-        public int MethodTypeId { get; set; }        
+        public int MethodTypeId { get; set; }
 
         [Required]
         [StringLength(250)]
@@ -64,16 +64,8 @@ namespace NC_Monitoring.Data.Models
 
         [InverseProperty("Monitor")]
         public virtual ICollection<NcMonitorRecord> NcMonitorRecord { get; set; }
-               
+
         [Column("LastTestCycleInterval")]
         public TimeSpan? LastTestCycleInterval { get; set; }
-        
-        public bool Enabled
-        {
-            get
-            {
-                return this.StatusEnum() != MonitorStatus.InActive;
-            }
-        }
     }
 }

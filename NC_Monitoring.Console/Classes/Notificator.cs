@@ -144,18 +144,13 @@ namespace NC_Monitoring.ConsoleApp.Classes
                             continue;
                     }
 
-
-                    foreach (string contact in channel.NcChannelSubscriber.Select(contactSelect))
+                    await queue.PushAsync(QueueType.Notification, new NotifyItem
                     {
-
-                        await queue.PushAsync(QueueType.Notification, new NotifyItem
-                        {
-                            ChannelType = chnlType,
-                            Subject = subject,
-                            Message = message,
-                            Contact = contact,
-                        });
-                    }
+                        ChannelType = chnlType,
+                        Subject = subject,
+                        Message = message,
+                        Contact = string.Join(";", channel.NcChannelSubscriber.Select(contactSelect)),
+                    });
                 }
 
                 await monitorManager.SetLastTestCycleIntervalsAsync(monitor, timeInErrorStatus);

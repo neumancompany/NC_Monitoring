@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NC.AspNetCore.Interfaces;
 using NC_Monitoring.Business.DTO;
 using NC_Monitoring.Data.Enums;
+using NC_Monitoring.Data.Extensions;
 using NC_Monitoring.Data.Models;
 using NC_Monitoring.ViewModels;
 using System;
@@ -17,7 +18,6 @@ namespace NC_Monitoring.Mapper
         {
             cfg.CreateMap<MonitorFormViewModel, NcMonitor>()
                     .ForMember(x => x.StatusId, m => m.MapFrom(x => (int)(x.Enabled ? MonitorStatus.OK : MonitorStatus.InActive)))
-                    .ForMember(x => x.Enabled, m => m.Ignore())
                     ;
             cfg.CreateMap<NcMonitor, MonitorFormViewModel>()
                 //.ForMember(x => x.StatusName, m => m.MapFrom(x => x.Status.Name))
