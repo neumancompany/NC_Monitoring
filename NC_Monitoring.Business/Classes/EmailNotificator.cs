@@ -1,13 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NC_Monitoring.Business.Interfaces;
-using NC_Monitoring.Data.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Mail;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NC_Monitoring.Business.Classes
@@ -35,8 +31,17 @@ namespace NC_Monitoring.Business.Classes
 
         public async Task SendEmailAsync(string emailTo, string subject, string message)
         {
-            using (var mailMsg = new MailMessage(addressFrom, emailTo) { Subject = subject, Body = message, })
+            if (emailTo == null)
             {
+                throw new ArgumentNullException($"{nameof(emailTo)} cant be null.");
+            }
+
+            using (var mailMsg = new MailMessage() { From = new MailAddress(addressFrom), Subject = subject, Body = message, })
+            {
+                foreach (string email in emailTo.Split(';').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)))
+                {
+                    mailMsg.To.Add(email);
+                }
                 await smtpClient.SendMailAsync(mailMsg);
                 logger.LogInformation($"SendEmail: To=[{emailTo}] Subject[{subject}] Message=[{message}]");
             }
