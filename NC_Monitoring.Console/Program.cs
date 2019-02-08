@@ -1,64 +1,59 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NC_Monitoring.ConsoleApp.WebJobs;
+using System;
+using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NC_Monitoring.Business.Classes;
-using NC_Monitoring.Business.Interfaces;
+using System.Globalization;
+using System.Reflection;
+using System.IO;
+using NC_Monitoring.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using NC_Monitoring.Business.Managers;
 using NC_Monitoring.ConsoleApp.Classes;
 using NC_Monitoring.ConsoleApp.Interfaces;
 using NC_Monitoring.Data.Interfaces;
-using NC_Monitoring.Data.Models;
+using NC_Monitoring.Business.Interfaces;
 using NC_Monitoring.Data.Repositories;
-using System;
-using System.Linq;
-using System.Net;
+using NC_Monitoring.Business.Classes;
 using System.Net.Mail;
-using System.Threading.Tasks;
+using System.Net;
 
 namespace NC_Monitoring.ConsoleApp
 {
     internal class Program
     {
-        private readonly ILogger<Program> logger;
-        private readonly IConfiguration Configuration;
-        private readonly IServiceProvider serviceProvider;
+        //private static ILogger<Program> logger;
+        private static IServiceProvider serviceProvider;
 
-        public Program(string[] args)
+        private static void ConfigureServices(IServiceCollection services)
         {
-            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var configuration = GetWebJobConfiguration();
 
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Environment.CurrentDirectory)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
-
-            IServiceCollection services = new ServiceCollection();
-
-            services.AddSingleton(Configuration);
+            AddWebJobsCommonServices(configuration);
 
             services.AddDbContext<ApplicationDbContext>(options =>
                     options
                         .UseLazyLoadingProxies()
                         .UseSqlServer(
-                            Configuration.GetConnectionString("DefaultConnection")));
+                            configuration.GetConnectionString("DefaultConnection")));
 
             services
                 .AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddUserManager<ApplicationUserManager>();
 
-            services.AddAutoMapper();
+            //services.AddAutoMapper();
 
             services.AddLogging((logging) =>
             {
-                logging.AddConfiguration(Configuration.GetSection("Logging"));
-                logging.AddConsole();
-                logging.AddLog4Net();
+                logging
+                    .AddConfiguration(configuration.GetSection("Logging"))
+                    .AddConsole()
+                    .AddLog4Net();
             });
 
             services
@@ -76,71 +71,77 @@ namespace NC_Monitoring.ConsoleApp
                 .AddTransient<INotificator, Notificator>()
                 .AddTransient<IEmailNotificator, EmailNotificator>();
 
+            services.AddTransient<Functions, Functions>();
+
             services.AddScoped<SmtpClient>(conf =>
             {
                 return new SmtpClient()
                 {
-                    Host = Configuration.GetValue<string>("Email:Smtp:Host"),
-                    Port = Configuration.GetValue<int>("Email:Smtp:Port"),
+                    Host = configuration.GetValue<string>("Email:Smtp:Host"),
+                    Port = configuration.GetValue<int>("Email:Smtp:Port"),
                     Credentials = new NetworkCredential(
-                        Configuration.GetValue<string>("Email:Smtp:Username"),
-                        Configuration.GetValue<string>("Email:Smtp:Password")
+                        configuration.GetValue<string>("Email:Smtp:Username"),
+                        configuration.GetValue<string>("Email:Smtp:Password")
                     )
                 };
             });
-
-            serviceProvider = services
-                .BuildServiceProvider();
-
-            logger = serviceProvider.GetService<ILoggerFactory>()
-                .AddLog4Net()
-                .CreateLogger<Program>();
         }
 
         private static void Main(string[] args)
         {
-            Program program = new Program(args);
+            // .NET Core sets the source directory as the working directory - so change that:
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
 
-            program.Run().Wait();
+            IServiceCollection services = new ServiceCollection();
+            ConfigureServices(services);
+
+            serviceProvider = services.BuildServiceProvider();
+
+            CultureInfo culture = CultureInfo.CreateSpecificCulture("cs-CZ");
+
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+            //Program program = new Program(args);
+            var config = new JobHostConfiguration();
+            if (config.IsDevelopment)
+            {
+                config.UseDevelopmentSettings();
+            }
+
+            config.Queues.MaxPollingInterval = TimeSpan.FromSeconds(10);
+            config.Queues.VisibilityTimeout = TimeSpan.FromMinutes(1);
+            config.Queues.BatchSize = 1;
+            config.JobActivator = new JobActivator(serviceProvider);
+            config.UseTimers();
+
+            var host = new JobHost(config);
+            // The following code ensures that the WebJob will be running continuously
+            host.RunAndBlock();
         }
 
-        private async Task Run()
+        private static void AddWebJobsCommonServices(IConfigurationRoot configuration)
         {
-            try
+            if (String.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("AzureWebJobsStorage")))
             {
-                if (!TimeSpan.TryParse(Configuration["MonitoringInterval"], out TimeSpan interval))
-                {
-                    //pokud neni nastaven interval v configu, tak se nastavi na 1 minutu
-                    interval = TimeSpan.FromMinutes(1);
-                }
-
-                while (true)
-                {
-                    try
-                    {
-                        //v kazdem novem cyklu si vytvorime novy scope,
-                        //aby se nam aktualizoval DBContext, napr. pokud se DB
-                        //aktualizuje z venci (administrace), tak zde by se to neprojevilo
-                        using (IServiceScope scope = serviceProvider.CreateScope())
-                        {
-                            Monitoring monitoring = scope.ServiceProvider.GetService<Monitoring>();
-
-                            monitoring.CheckMonitors(serviceProvider);
-
-                            await scope.ServiceProvider.GetService<INotificator>().SendAllNotifications();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, "CheckMonitors: Unexpected error");
-                    }
-                    await Task.Delay(interval);
-                }
+                // Env variables would be set on azure. But not locally. If missing, set them to the connection string
+                Environment.SetEnvironmentVariable("AzureWebJobsStorage", configuration.GetConnectionString("AzureWebJobsStorage"));
+                Environment.SetEnvironmentVariable("AzureWebJobsDashboard", configuration.GetConnectionString("AzureWebJobsDashboard"));
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Unexpected error");
-            }
+        }
+
+        private static IConfigurationRoot GetWebJobConfiguration()
+        {
+            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                //.AddJsonFile($"appsettings.{environmentName}.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            return configuration;
         }
     }
 }
