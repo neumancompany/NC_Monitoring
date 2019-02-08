@@ -32,7 +32,7 @@ namespace NC_Monitoring.Data.Models
                 .HasConversion(new EnumToStringConverter<QueueType>());
 
             //SEED
-            modelBuilder.Entity<NcChannelType>().HasData(                
+            modelBuilder.Entity<NcChannelType>().HasData(
                 new NcChannelType
                 {
                     Id = (int)ChannelType.Email,
@@ -43,7 +43,7 @@ namespace NC_Monitoring.Data.Models
             modelBuilder.Entity<NcMonitorMethodType>().HasData(
                 new NcMonitorMethodType
                 {
-                    Id = 1,
+                    Id = (int)MonitorMethod.Get,
                     Name = "GET"
                 }
             );
@@ -89,7 +89,7 @@ namespace NC_Monitoring.Data.Models
             //modelBuilder.Entity<NcChannelSubscriber>().HasData(
             //    // nelze ziskat ID uzivatele, jelikoz je to GUID a vytvori se az pri inicializaci DB
             //    //new NcChannelSubscriber { Id = 1, , UserId = 1, ChannelId = 1 },
-            //    //new NcChannelSubscriber { Id = 2, UserId = 1, ChannelId = 1 } 
+            //    //new NcChannelSubscriber { Id = 2, UserId = 1, ChannelId = 1 }
             //);
 
             modelBuilder.Entity<NcScenario>().HasData(

@@ -1,9 +1,18 @@
-﻿
+﻿@using NC_Monitoring.Data.Enums
+
 @{
     ViewData["Title"] = "Monitors";
 }
 
 <h1>@ViewData["Title"]</h1>
+
+<script>
+    function initNewRow(e) {
+        e.data.MethodTypeId = @((int)MonitorMethod.Get);
+        e.data.VerificationTypeId = @((int)MonitorVerification.Keyword);
+        e.data.Timeout = "00:01";
+    }
+</script>
 
 @(Html.DevExtreme().DataGrid<MonitorFormViewModel>()
                 .DataSource(d => d.Mvc()
@@ -13,6 +22,7 @@
                     .UpdateAction("Put")
                     .DeleteAction("Delete")
                     .Key("Id"))
+                .OnInitNewRow("initNewRow")
                 .Editing(e=>e.AllowEditingByUser(User))
                 .Columns(col =>
                 {
@@ -44,9 +54,6 @@
                     col.AddFor(m => m.Timeout)
                         .FormItem(frm => frm
                             .HelpText<MonitorFormViewModel>(x => x.Timeout)
-                            .Editor(formItem => formItem
-                                .DateBox()
-                                .PickerType(DateBoxPickerType.Rollers))
                             );
 
                 })

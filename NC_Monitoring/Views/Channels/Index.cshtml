@@ -1,4 +1,6 @@
-﻿@model ChannelViewModel
+﻿@using NC_Monitoring.Data.Enums
+
+@model ChannelViewModel
 
 @{
     ViewData["Title"] = "Channels";
@@ -6,14 +8,21 @@
 
 <h1>@ViewData["Title"]</h1>
 
+<script>
+    function initNewRow(e) {
+        e.data.ChannelTypeId = @((int)ChannelType.Email)
+    }
+</script>
+
 @(Html.DevExtreme().DataGrid<ChannelViewModel>()
         .DataSource(d => d.Mvc()
-                        .Controller<ChannelsController>()
-                        .LoadAction("Load")
-                        .InsertAction("Post")
-                        .UpdateAction("Put")
-                        .DeleteAction("Delete")
-                        .Key("Id"))
+            .Controller<ChannelsController>()
+            .LoadAction("Load")
+            .InsertAction("Post")
+            .UpdateAction("Put")
+            .DeleteAction("Delete")
+            .Key("Id"))
+        .OnInitNewRow("initNewRow")
         .Editing(e => e.AllowEditingByUser(User))
         .Columns(col =>
         {
