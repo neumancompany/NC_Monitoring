@@ -23,6 +23,7 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.5" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.1.1" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.development.json">
@@ -41,5 +42,8 @@
   <ItemGroup>
     <ProjectReference Include="..\NC_Monitoring.Business\NC_Monitoring.Business.csproj" />
     <ProjectReference Include="..\NC_Monitoring.Data\NC_Monitoring.Data.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 </Project>

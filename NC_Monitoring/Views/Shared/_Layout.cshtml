@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
+<!DOCTYPE html>
 
 <html>
 <head>
@@ -61,6 +62,7 @@
         <script src="~/vendor/globalize/dist/globalize.js"></script>
         <script src="~/vendor/globalize/dist/globalize/number.js"></script>*@
 
+    @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
 
 <body>

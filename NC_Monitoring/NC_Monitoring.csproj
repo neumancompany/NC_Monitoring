@@ -9,6 +9,8 @@
     <TypeScriptToolsVersion>3.0</TypeScriptToolsVersion>
     <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
     <UserSecretsId>afc4d441-6130-4951-bbd6-00806b620cc7</UserSecretsId>
+    <ApplicationInsightsResourceId>/subscriptions/b7f283f8-1543-415f-be6d-16a475f883fb/resourcegroups/NCMonitoringTest/providers/microsoft.insights/components/NCMonitoring20190122042034</ApplicationInsightsResourceId>
+    <ApplicationInsightsAnnotationResourceId>/subscriptions/b7f283f8-1543-415f-be6d-16a475f883fb/resourcegroups/NCMonitoringTest/providers/microsoft.insights/components/NCMonitoring20190122042034</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="wwwroot\**\*;Views\**\*;Areas\**\Views;appsettings.json;web.config">
@@ -17,9 +19,6 @@
     <Compile Remove="NC\**" />
     <EmbeddedResource Remove="NC\**" />
     <None Remove="NC\**" />
-    <Content Include="appsettings.development.json">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
     <Content Include="bower.json" />
     <Content Include="Properties\launchSettings.json" />
   </ItemGroup>
@@ -30,6 +29,7 @@
     <PackageReference Include="Castle.Core" Version="4.3.1" />
     <PackageReference Include="DevExtreme.AspNet.Core" Version="18.2.3" />
     <PackageReference Include="DevExtreme.AspNet.Data" Version="2.0.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="2.8.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
@@ -38,7 +38,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.0.2105168" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink.Loader" Version="14.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.5"/>
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.5" />
     <PackageReference Include="NC" Version="1.0.0" />
     <PackageReference Include="NC.AspNetCore" Version="1.2.0" />
     <PackageReference Include="NC.DevExtreme.AspNetCore" Version="1.3.2" />
@@ -59,6 +59,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\PublishProfiles\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>

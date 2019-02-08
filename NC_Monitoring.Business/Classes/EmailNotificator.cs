@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace NC_Monitoring.Business.Classes
 {
-    public class EmailNotificator : IDisposable, IEmailNotificator
+    public class EmailNotificator : IEmailNotificator, IDisposable
     {
         private readonly SmtpClient smtpClient;
         private readonly ILogger<EmailNotificator> logger;

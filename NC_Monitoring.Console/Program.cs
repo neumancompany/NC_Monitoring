@@ -21,6 +21,7 @@ using NC_Monitoring.Data.Repositories;
 using NC_Monitoring.Business.Classes;
 using System.Net.Mail;
 using System.Net;
+using AutoMapper;
 
 namespace NC_Monitoring.ConsoleApp
 {
@@ -35,6 +36,8 @@ namespace NC_Monitoring.ConsoleApp
 
             AddWebJobsCommonServices(configuration);
 
+            services.AddSingleton<IConfiguration>(configuration);
+
             services.AddDbContext<ApplicationDbContext>(options =>
                     options
                         .UseLazyLoadingProxies()
@@ -46,7 +49,7 @@ namespace NC_Monitoring.ConsoleApp
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddUserManager<ApplicationUserManager>();
 
-            //services.AddAutoMapper();
+            services.AddAutoMapper();
 
             services.AddLogging((logging) =>
             {
@@ -120,7 +123,7 @@ namespace NC_Monitoring.ConsoleApp
             host.RunAndBlock();
         }
 
-        private static void AddWebJobsCommonServices(IConfigurationRoot configuration)
+        private static void AddWebJobsCommonServices(IConfiguration configuration)
         {
             if (String.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("AzureWebJobsStorage")))
             {
@@ -130,14 +133,14 @@ namespace NC_Monitoring.ConsoleApp
             }
         }
 
-        private static IConfigurationRoot GetWebJobConfiguration()
+        private static IConfiguration GetWebJobConfiguration()
         {
             var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                //.AddJsonFile($"appsettings.{environmentName}.json", optional: true)
+                .AddJsonFile($"appsettings.{environmentName}.json", optional: true)
                 .AddEnvironmentVariables()
                 .Build();
 

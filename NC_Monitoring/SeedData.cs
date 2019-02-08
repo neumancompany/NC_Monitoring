@@ -4,10 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NC_Monitoring.Data.Enums;
 using NC_Monitoring.Data.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NC_Monitoring
 {
@@ -30,18 +27,31 @@ namespace NC_Monitoring
             var globalAdmins = configuration.GetSection("GlobalAdmins")
                 .GetChildren()
                 .ToList()
-                .Select(x=>(
+                .Select(x => (
                     x.GetValue<string>("UserName"),
                     x.GetValue<string>("Password")))
-                .ToList<(string UserName, string Password)>();
+                //.ToList<(string UserName, string Password)>()
+                .ToDictionary(k => k.Item1, k => k.Item2, StringComparer.InvariantCultureIgnoreCase);
 
-            foreach(var globalAdmin in globalAdmins)
+            foreach (var globalAdmin in globalAdmins)
             {
-                ApplicationUser user = userManager.AddUser(globalAdmin.UserName, globalAdmin.Password, nameof(UserRole.Admin));
+                ApplicationUser user = userManager.AddUser(globalAdmin.Key, globalAdmin.Value, nameof(UserRole.Admin));
 
-                user.GlobalAdmin = true;
+                if (!user.GlobalAdmin)
+                {
+                    user.GlobalAdmin = true;
+                    userManager.UpdateAsync(user).Wait();
+                }
+            }
 
-                userManager.UpdateAsync(user).Wait();
+
+            foreach (ApplicationUser user in userManager.Users.Where(x => !globalAdmins.ContainsKey(x.UserName)))
+            {
+                if (user.GlobalAdmin)
+                {
+                    user.GlobalAdmin = false;
+                    userManager.UpdateAsync(user).Wait();
+                }
             }
         }
 
@@ -53,8 +63,7 @@ namespace NC_Monitoring
 
         private static void SeedUsers(UserManager<ApplicationUser> userManager)
         {
-            userManager.AddUser("admin@admin.cz", "admin12", nameof(UserRole.Admin));
-            userManager.AddUser("user@user.cz", "user12", nameof(UserRole.User));
+            //userManager.AddUser("admin@admin.cz", "admin12", nameof(UserRole.Admin));
         }
 
         private static bool AddRole(this RoleManager<ApplicationRole> roleManager, string roleName)

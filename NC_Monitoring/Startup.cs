@@ -41,11 +41,13 @@ namespace NC_Monitoring
             Configuration = builder.Build();
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IConfiguration>(Configuration);
+
             // Add framework services.
             services
                 .AddMvc(o =>
@@ -112,7 +114,7 @@ namespace NC_Monitoring
                 .AddTransient<IChannelRepository, ChannelRepository>()
 
                 .AddTransient<IScenarioRepository, ScenarioRepository>();
-            
+
             services
                 .AddTransient<IEmailNotificator, EmailNotificator>()
                 .AddScoped<SmtpClient>(conf =>
