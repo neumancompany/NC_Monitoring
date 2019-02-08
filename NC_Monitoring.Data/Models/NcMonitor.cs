@@ -67,5 +67,13 @@ namespace NC_Monitoring.Data.Models
 
         [Column("LastTestCycleInterval")]
         public TimeSpan? LastTestCycleInterval { get; set; }
+
+        public bool Enabled
+        {
+            get
+            {
+                return this.StatusEnum() != MonitorStatus.InActive;
+            }
+        }
     }
 }

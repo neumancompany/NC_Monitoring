@@ -74,7 +74,7 @@ namespace NC_Monitoring.Data.Repositories
 
         public List<NcMonitor> MonitorsToCheck()
         {
-            return context.NcMonitor.Where(x => x.Enabled()).ToList();
+            return context.NcMonitor.Where(x => x.Enabled).ToList();
         }
     }
 }

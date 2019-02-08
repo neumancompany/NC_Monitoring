@@ -80,7 +80,7 @@ namespace NC_Monitoring.ConsoleApp.Classes
 
         private MonitorResult CheckMonitor(NcMonitor monitor)
         {
-            if (monitor.Enabled())
+            if (monitor.Enabled)
             {
                 int timeout = (int)monitor.Timeout.TotalMilliseconds;
                 switch (monitor.VerificationEnum())
