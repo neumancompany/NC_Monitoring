@@ -1,12 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using NC.AspNetCore.Filters;
 using NC_Monitoring.Business.Managers;
 using NC_Monitoring.Data.Enums;
 using NC_Monitoring.Data.Models;
 using NC_Monitoring.ViewModels;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace NC_Monitoring.Controllers
@@ -54,8 +60,64 @@ namespace NC_Monitoring.Controllers
                     return View(model);
                 }
             }
-            
+
             return View(model);
+        }
+
+        public class AuthenticationViewModel
+        {
+            [Required]
+            [EmailAddress]
+            public string Username { get; set; }
+
+            [Required]
+            public string Password { get; set; }
+        }
+
+        [HttpPost("/api/authenticate")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Authenticate([FromBody]AuthenticationViewModel loginDTO)
+        {
+            if (TryValidateModel(loginDTO))
+            {
+                var username = loginDTO?.Username;
+                var password = loginDTO?.Password;
+
+                var user = await userManager.FindByNameAsync(username);
+
+                if (user != null)
+                {
+                    var result = await signInManager.PasswordSignInAsync(user, password, false, true);
+
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var key = Encoding.ASCII.GetBytes(Startup.SECRET);
+                    var tokenDescriptor = new SecurityTokenDescriptor
+                    {
+                        Subject = new ClaimsIdentity(new Claim[]
+                        {
+                        new Claim(ClaimTypes.Name, user.Id.ToString())
+                        }),
+                        Expires = DateTime.UtcNow.AddDays(7),
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                    };
+
+                    var token = tokenHandler.CreateToken(tokenDescriptor);
+                    var tokenString = tokenHandler.WriteToken(token);
+
+                    if (result.Succeeded)
+                    {
+                        return Ok(new
+                        {
+                            Id = user.Id,
+                            Username = user.UserName,
+                            Email = user.Email,
+                            Token = tokenString,
+                        });
+                    }
+                }
+            }
+
+            return BadRequest(ModelState.GetFullErrorMessage());
         }
 
         [HttpPost("Logout")]

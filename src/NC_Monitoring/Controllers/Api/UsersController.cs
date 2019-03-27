@@ -6,28 +6,23 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NC.AspNetCore.Extensions;
-using NC_Monitoring.Business.Classes;
-using NC_Monitoring.Business.DTO;
 using NC_Monitoring.Business.Extensions;
 using NC_Monitoring.Business.Interfaces;
 using NC_Monitoring.Business.Managers;
 using NC_Monitoring.Controllers.Base;
 using NC_Monitoring.Data.Enums;
-using NC_Monitoring.Data.Interfaces;
 using NC_Monitoring.Data.Models;
 using NC_Monitoring.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NC_Monitoring.Controllers.Api
 {
     public class UsersController : BaseApiController
     {
-
         private readonly ApplicationUserManager userManager;
         private readonly ApplicationRoleManager roleManager;
         private readonly IMapper mapper;
@@ -44,7 +39,7 @@ namespace NC_Monitoring.Controllers.Api
         [HttpGet]
         public async Task<List<UserViewModel>> Load()
         {
-            Dictionary<Guid, ApplicationUser> appUsers = userManager.Users.ToDictionary(k=>k.Id, v=>v);
+            Dictionary<Guid, ApplicationUser> appUsers = userManager.Users.ToDictionary(k => k.Id, v => v);
             List<UserViewModel> users = mapper.MapEnumerable<UserViewModel>(userManager.Users).ToList();
 
             ApplicationUser currentUser = await userManager.GetUserAsync(User);
@@ -163,7 +158,7 @@ namespace NC_Monitoring.Controllers.Api
         [HttpGet]
         public LoadResult RolesSelectList(DataSourceLoadOptions options)
         {
-            return DataSourceLoader.Load(roleManager.Roles.ToSelectList(x=>x.Name, x=>x.Name), options);
+            return DataSourceLoader.Load(roleManager.Roles.ToSelectList(x => x.Name, x => x.Name), options);
         }
     }
 }
