@@ -1,5 +1,5 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using NC_Monitoring.Business.Classes;
 using NC_Monitoring.Business.Interfaces;
 using NC_Monitoring.Business.Managers;
@@ -22,11 +23,14 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Mail;
+using System.Text;
 
 namespace NC_Monitoring
 {
     public class Startup
     {
+        public const string SECRET = "asdad546asd45a6d4a6d123132";
+
         public Startup(IHostingEnvironment env)
         {
             var sharedFolder = Path.Combine(env.ContentRootPath, "..", "Shared");
@@ -50,13 +54,14 @@ namespace NC_Monitoring
 
             // Add framework services.
             services
-                .AddMvc(o =>
+                .AddMvc(config =>
                {//vyzadani globalni autorizace na vsech strankach, ktere nemaji atribut [AllowAnonymous]
-                   var policy = new AuthorizationPolicyBuilder()
-                      .RequireAuthenticatedUser()
-                      .Build();
+                   var defaultPolicy = new AuthorizationPolicyBuilder(new[] { JwtBearerDefaults.AuthenticationScheme, IdentityConstants.ApplicationScheme })
+                         .RequireAuthenticatedUser()
+                         .Build();
 
-                   o.Filters.Add(new AuthorizeFilter(policy));
+                   config.Filters.Add(new AuthorizeFilter(defaultPolicy));
+                   //config.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                })
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -130,17 +135,55 @@ namespace NC_Monitoring
                     };
                 });
 
-            services
-                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-                {
-                    options.Cookie.HttpOnly = true;
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+            var key = Encoding.ASCII.GetBytes(SECRET);
 
-                    options.LoginPath = "/Account/Login";
-                    options.AccessDeniedPath = "/Account/AccessDenied";
-                    options.SlidingExpiration = true;
-                });
+            services
+                .AddAuthentication()
+                    //    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                    //    {
+                    //        options.Cookie.HttpOnly = true;
+                    //        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+                    //        options.LoginPath = "/Account/Login";
+                    //        options.AccessDeniedPath = "/Account/AccessDenied";
+                    //        options.SlidingExpiration = true;
+                    //    })
+                    .AddJwtBearer(cfg =>
+                    {
+                        cfg.Events = new JwtBearerEvents
+                        {
+                            OnTokenValidated = async context =>
+                            {
+                                var userService = context.HttpContext.RequestServices.GetRequiredService<ApplicationUserManager>();
+                                var userId = Guid.Parse(context.Principal.Identity.Name);
+                                var user = await userService.FindByIdAsync(userId);
+                                if (user == null)
+                                {
+                                    // return unauthorized if user no longer exists
+                                    context.Fail("Unauthorized");
+                                }
+                            }
+                        };
+                        cfg.RequireHttpsMetadata = false;
+                        //x.SaveToken = true;
+                        cfg.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            //ValidateIssuerSigningKey = true,
+                            //IssuerSigningKey = new SymmetricSecurityKey(key),
+                            //ValidateIssuer = false,
+                            //ValidateAudience = false
+                            RequireExpirationTime = false,
+
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            ValidIssuer = "JWAPI",
+                            ValidAudience = "SampleAudiance",
+                            IssuerSigningKey = new SymmetricSecurityKey(key),
+                            ClockSkew = TimeSpan.Zero
+                        };
+                    })
+                ;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
