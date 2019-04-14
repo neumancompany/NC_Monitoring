@@ -30,6 +30,8 @@ namespace NC_Monitoring
     public class Startup
     {
         public const string SECRET = "asdad546asd45a6d4a6d123132";
+        public const string JWTAudience = "https://monitoring.ncompany.cz";
+        public const string JWTIssuer = JWTAudience;
 
         public Startup(IHostingEnvironment env)
         {
@@ -56,11 +58,11 @@ namespace NC_Monitoring
             services
                 .AddMvc(config =>
                {//vyzadani globalni autorizace na vsech strankach, ktere nemaji atribut [AllowAnonymous]
-                   var defaultPolicy = new AuthorizationPolicyBuilder(new[] { JwtBearerDefaults.AuthenticationScheme, IdentityConstants.ApplicationScheme })
-                         .RequireAuthenticatedUser()
-                         .Build();
+                   //var defaultPolicy = new AuthorizationPolicyBuilder(new[] { JwtBearerDefaults.AuthenticationScheme, IdentityConstants.ApplicationScheme })
+                   //      .RequireAuthenticatedUser()
+                   //      .Build();
 
-                   config.Filters.Add(new AuthorizeFilter(defaultPolicy));
+                   //config.Filters.Add(new AuthorizeFilter(defaultPolicy));
                    //config.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                })
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
@@ -78,7 +80,8 @@ namespace NC_Monitoring
             //Configuration.GetConnectionString("DefaultConnection")));
 
             //services.AddIdentity<ApplicationUser, ApplicationRole>(options => options.Stores.MaxLengthForKeys = 128)
-            services.AddIdentity<ApplicationUser, ApplicationRole>()
+            services                
+                .AddIdentity<ApplicationUser, ApplicationRole>()                
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 // .AddDefaultUI()//vytvoreni stranek pro prihlaseni /Ideneity/Account/Login atd.
                 .AddDefaultTokenProviders()
@@ -109,6 +112,60 @@ namespace NC_Monitoring
                     options.User.RequireUniqueEmail = false;
                 });
 
+            var key = Encoding.ASCII.GetBytes(SECRET);
+
+            services
+                .AddAuthorization(config =>
+                {
+                    var defaultPolicy = new AuthorizationPolicyBuilder(new[] { JwtBearerDefaults.AuthenticationScheme, IdentityConstants.ApplicationScheme })
+                          .RequireAuthenticatedUser()
+                          .Build();
+
+                    //config.Filters.Add(new AuthorizeFilter(defaultPolicy));
+                    config.DefaultPolicy = defaultPolicy;
+                })
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                    //    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                    //    {
+                    //        options.Cookie.HttpOnly = true;
+                    //        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+                    //        options.LoginPath = "/Account/Login";
+                    //        options.AccessDeniedPath = "/Account/AccessDenied";
+                    //        options.SlidingExpiration = true;
+                    //    })
+                    .AddJwtBearer(cfg =>
+                    {
+                        cfg.SaveToken = true;
+                        cfg.RequireHttpsMetadata = false; // https off                                                
+                        cfg.RequireHttpsMetadata = false;                        
+                        cfg.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            //ValidateIssuerSigningKey = true,
+                            //IssuerSigningKey = new SymmetricSecurityKey(key),
+                            //ValidateIssuer = false,
+                            //ValidateAudience = false
+
+                            RequireExpirationTime = true,
+                            ValidateIssuer = true,
+                            ValidateAudience = true,                                                        
+                            ValidIssuer = JWTAudience,
+                            ValidAudience = JWTIssuer,
+                            IssuerSigningKey = new SymmetricSecurityKey(key),
+
+                            //ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            //ClockSkew = TimeSpan.Zero
+                        };
+                    })
+                ;
+
+
             services
                 .AddTransient<IMonitorRepository, MonitorRepository>()
                 .AddTransient<IMonitorManager, MonitorManager>()
@@ -134,56 +191,6 @@ namespace NC_Monitoring
                         )
                     };
                 });
-
-            var key = Encoding.ASCII.GetBytes(SECRET);
-
-            services
-                .AddAuthentication()
-                    //    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-                    //    {
-                    //        options.Cookie.HttpOnly = true;
-                    //        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
-                    //        options.LoginPath = "/Account/Login";
-                    //        options.AccessDeniedPath = "/Account/AccessDenied";
-                    //        options.SlidingExpiration = true;
-                    //    })
-                    .AddJwtBearer(cfg =>
-                    {
-                        cfg.Events = new JwtBearerEvents
-                        {
-                            OnTokenValidated = async context =>
-                            {
-                                var userService = context.HttpContext.RequestServices.GetRequiredService<ApplicationUserManager>();
-                                var userId = Guid.Parse(context.Principal.Identity.Name);
-                                var user = await userService.FindByIdAsync(userId);
-                                if (user == null)
-                                {
-                                    // return unauthorized if user no longer exists
-                                    context.Fail("Unauthorized");
-                                }
-                            }
-                        };
-                        cfg.RequireHttpsMetadata = false;
-                        //x.SaveToken = true;
-                        cfg.TokenValidationParameters = new TokenValidationParameters
-                        {
-                            //ValidateIssuerSigningKey = true,
-                            //IssuerSigningKey = new SymmetricSecurityKey(key),
-                            //ValidateIssuer = false,
-                            //ValidateAudience = false
-                            RequireExpirationTime = false,
-
-                            ValidateAudience = true,
-                            ValidateLifetime = true,
-                            ValidateIssuerSigningKey = true,
-                            ValidIssuer = "JWAPI",
-                            ValidAudience = "SampleAudiance",
-                            IssuerSigningKey = new SymmetricSecurityKey(key),
-                            ClockSkew = TimeSpan.Zero
-                        };
-                    })
-                ;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

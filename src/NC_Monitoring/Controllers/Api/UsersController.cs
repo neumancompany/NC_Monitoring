@@ -36,7 +36,7 @@ namespace NC_Monitoring.Controllers.Api
             this.emailNotificator = emailNotificator;
         }
 
-        [HttpGet]
+        [HttpGet("Load")]
         public async Task<List<UserViewModel>> Load()
         {
             Dictionary<Guid, ApplicationUser> appUsers = userManager.Users.ToDictionary(k => k.Id, v => v);
@@ -72,7 +72,7 @@ namespace NC_Monitoring.Controllers.Api
             return users;
         }
 
-        [HttpPut]
+        [HttpPut("ResetPassword")]
         [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<IActionResult> ResetPassword(Guid key)
         {
@@ -105,7 +105,7 @@ namespace NC_Monitoring.Controllers.Api
             return Ok($"New password was send to email. ({foundUser.Email})");
         }
 
-        [HttpPut]
+        [HttpPut("Put")]
         [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<IActionResult> Put(Guid key, string values)
         {
@@ -132,7 +132,7 @@ namespace NC_Monitoring.Controllers.Api
             return Ok(key);
         }
 
-        [HttpDelete]
+        [HttpDelete("Delete")]
         [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<IActionResult> Delete(Guid key)
         {
@@ -155,7 +155,7 @@ namespace NC_Monitoring.Controllers.Api
             return Ok(key);
         }
 
-        [HttpGet]
+        [HttpGet("RolesSelectList")]
         public LoadResult RolesSelectList(DataSourceLoadOptions options)
         {
             return DataSourceLoader.Load(roleManager.Roles.ToSelectList(x => x.Name, x => x.Name), options);

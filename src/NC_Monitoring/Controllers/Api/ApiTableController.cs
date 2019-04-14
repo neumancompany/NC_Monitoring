@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NC_Monitoring.Controllers.Base;
@@ -25,7 +26,7 @@ namespace NC_Monitoring.Controllers.Api
             this.mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet("load")]        
         public virtual ActionResult<List<TFormViewModel>> Load()
         {
             //return DataSourceLoader.Load(mapper.Map<IEnumerable<TEntity>, IEnumerable<TViewModel>>(repository.GetAll()), loadOptions);
@@ -51,7 +52,7 @@ namespace NC_Monitoring.Controllers.Api
             return Ok(viewModel);
         }
 
-        [HttpPut]
+        [HttpPut("put")]
         [Authorize(Roles = nameof(UserRole.Admin))]
         public virtual async Task<IActionResult> Put(TKey key, string values)
         {
@@ -70,7 +71,7 @@ namespace NC_Monitoring.Controllers.Api
             return Ok(viewModel);
         }
 
-        [HttpDelete]
+        [HttpDelete("delete")]
         [Authorize(Roles = nameof(UserRole.Admin))]
         public virtual async Task<IActionResult> Delete(TKey key)
         {

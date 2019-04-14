@@ -19,6 +19,10 @@
     <Compile Remove="NC\**" />
     <EmbeddedResource Remove="NC\**" />
     <None Remove="NC\**" />
+    <None Remove="appsettings.development.json" />
+    <Content Include="appsettings.development.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="bower.json" />
     <Content Include="Properties\launchSettings.json" />
   </ItemGroup>

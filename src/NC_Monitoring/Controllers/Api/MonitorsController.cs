@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using DevExtreme.AspNet.Data;
 using DevExtreme.AspNet.Data.ResponseModel;
 using DevExtreme.AspNet.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NC.AspNetCore.Extensions;
@@ -20,7 +21,7 @@ using System.Linq.Expressions;
 
 namespace NC_Monitoring.Controllers.Api
 {
-
+    //[Route("/api/monitors")]    
     public class MonitorsController : ApiTableController<NcMonitor, MonitorFormViewModel, Guid>
     {
         protected new readonly IMonitorRepository repository;
@@ -34,15 +35,30 @@ namespace NC_Monitoring.Controllers.Api
 
         }
 
+        [HttpGet("MethodTypesSelectList")]
         public LoadResult MethodTypesSelectList(DataSourceLoadOptions loadOptions)
         {
             return DataSourceLoader.Load(repository.GetMethodTypes().ToSelectList(x => x.Id, x => x.Name), loadOptions);
         }
 
+        [HttpGet("VerificationTypesSelectList")]
         public LoadResult VerificationTypesSelectList(DataSourceLoadOptions loadOptions)
         {
             //return mapper.Map<List<ISelectItem<int>>>(repository.GetVerificationTypes());
             return DataSourceLoader.Load(repository.GetVerificationTypes().ToSelectList(x => x.Id, x => x.Name), loadOptions);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult Get(Guid id)
+        {
+            var detail = repository.FindById(id);
+
+            if (detail == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(mapper.Map<NcMonitor, MonitorDetailDTO>(detail));
         }
 
         #region "Records"
@@ -52,6 +68,7 @@ namespace NC_Monitoring.Controllers.Api
         {
             return DataSourceLoader.Load(mapper.MapQueryable<MonitorRecordListDTO>(monitorManager.GetAllRecords().OrderByDescending(x => x.StartDate)), loadOptions);
         }
+
         [Route("/api/records/ForMonitorLoad", Name = "RecordsForMonitorLoad")]
         public IEnumerable<MonitorRecordListDTO> RecordsForMonitorLoad(Guid monitorId)
         {

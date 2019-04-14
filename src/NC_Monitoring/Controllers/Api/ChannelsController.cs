@@ -35,20 +35,23 @@ namespace NC_Monitoring.Controllers.Api
             this.logger = logger;
         }
 
+        [HttpGet("selectList")]
         public LoadResult SelectList(DataSourceLoadOptions loadOptions)
         {
             return DataSourceLoader.Load(repository.GetAll().ToSelectList(x => x.Id, x => x.Name), loadOptions);
         }
 
+        [HttpGet("TypesSelectList")]
         public LoadResult TypesSelectList(DataSourceLoadOptions loadOptions)
         {
             //return repository.GetChannelTypes().ToSelectList(x => x.Id, x => x.Name);
             return DataSourceLoader.Load(channelManager.GetChannelTypes().ToSelectList(x => x.Id, x => x.Name), loadOptions);
         }
 
+        [HttpGet("UserSelectList")]
         public LoadResult UserSelectList(DataSourceLoadOptions loadOptions)
         {
-            return DataSourceLoader.Load(userManager.Users.ToSelectList(x=>x.Id, x=>x.Email), loadOptions);
+            return DataSourceLoader.Load(userManager.Users.ToSelectList(x => x.Id, x => x.Email), loadOptions);
         }
 
         //public LoadResult UserSelectList(DataSourceLoadOptions loadOptions, int channelId)
@@ -58,12 +61,13 @@ namespace NC_Monitoring.Controllers.Api
 
         #region "Subscribers"
 
+        [HttpGet("SubscriberLoad")]
         public IEnumerable<ChannelSubscriberViewModel> SubscriberLoad(int channelId)
         {
             return mapper.MapEnumerable<NcChannelSubscriber, ChannelSubscriberViewModel>(channelManager.GetSubscribersByChannel(channelId));
         }
 
-        [HttpPost]
+        [HttpPost("SubscriberPost")]
         [Authorize(Roles = nameof(UserRole.Admin))]
         public virtual IActionResult SubscriberPost(string values)
         {
@@ -77,7 +81,7 @@ namespace NC_Monitoring.Controllers.Api
             return channelManager.SubscriberInsertAsync(entity).WaitForActionResult();
         }
 
-        [HttpPut]
+        [HttpPut("SubscriberPut")]
         [Authorize(Roles = nameof(UserRole.Admin))]
         public virtual IActionResult SubscriberPut(int key, string values)
         {
@@ -92,7 +96,7 @@ namespace NC_Monitoring.Controllers.Api
             return channelManager.SubscriberUpdateAsync(entity).WaitForActionResult();
         }
 
-        [HttpDelete]
+        [HttpDelete("SubscriberDelete")]
         [Authorize(Roles = nameof(UserRole.Admin))]
         public virtual IActionResult SubscriberDelete(int key)
         {

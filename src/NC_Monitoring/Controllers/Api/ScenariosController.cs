@@ -28,18 +28,20 @@ namespace NC_Monitoring.Controllers.Api
             this.scenarioRepository = scenarioRepository;
         }
 
+        [HttpGet("SelectList")]
         public LoadResult SelectList(DataSourceLoadOptions loadOptions)
         {
             return DataSourceLoader.Load(Load().Value.ToSelectList(x => x.Id, x => x.Name), loadOptions);
         }
 
+        [HttpGet("ItemsLoad")]
         public IEnumerable<ScenarioItemViewModel> ItemsLoad(int id)
         {
             return mapper.MapEnumerable<NcScenarioItem, ScenarioItemViewModel>(
                 scenarioRepository.GetItems(id).OrderBy(x => x.TestCycleInterval));
         }
 
-        [HttpPost]
+        [HttpPost("ItemsPost")]
         public async Task<IActionResult> ItemsPost(string values)
         {
             var entity = new NcScenarioItem();
@@ -56,7 +58,7 @@ namespace NC_Monitoring.Controllers.Api
             return Ok(viewModel);
         }
 
-        [HttpPut]
+        [HttpPut("ItemsPut")]
         public async Task<IActionResult> ItemsPut(int key, string values)
         {
             var entity = scenarioRepository.FindItemById(key);
@@ -73,7 +75,7 @@ namespace NC_Monitoring.Controllers.Api
             return Ok(viewModel);
         }
 
-        [HttpDelete]
+        [HttpDelete("ItemsDelete")]
         [Authorize]
         public async Task ItemsDelete(int key)
         {
