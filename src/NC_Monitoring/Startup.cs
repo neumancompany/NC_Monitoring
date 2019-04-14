@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -80,8 +81,8 @@ namespace NC_Monitoring
             //Configuration.GetConnectionString("DefaultConnection")));
 
             //services.AddIdentity<ApplicationUser, ApplicationRole>(options => options.Stores.MaxLengthForKeys = 128)
-            services                
-                .AddIdentity<ApplicationUser, ApplicationRole>()                
+            services
+                .AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 // .AddDefaultUI()//vytvoreni stranek pro prihlaseni /Ideneity/Account/Login atd.
                 .AddDefaultTokenProviders()
@@ -114,7 +115,7 @@ namespace NC_Monitoring
 
             var key = Encoding.ASCII.GetBytes(SECRET);
 
-            services                
+            services
                 //.AddAuthorization(config =>
                 //{
                 //    var defaultPolicy = new AuthorizationPolicyBuilder(new[] { JwtBearerDefaults.AuthenticationScheme, IdentityConstants.ApplicationScheme })
@@ -124,6 +125,27 @@ namespace NC_Monitoring
                 //    //config.Filters.Add(new AuthorizeFilter(defaultPolicy));
                 //    config.DefaultPolicy = defaultPolicy;
                 //})
+                .ConfigureApplicationCookie(options =>
+                {
+                    options.Events = new CookieAuthenticationEvents
+                    {
+                        OnRedirectToLogin = async ctx =>
+                        {
+                            if (ctx.Request.Path.StartsWithSegments("/api"))
+                            {
+                                if (ctx.Response.StatusCode == (int)HttpStatusCode.OK)
+                                {
+                                    ctx.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                                }
+                            }
+                            else
+                            {
+                                ctx.Response.Redirect(ctx.RedirectUri);
+                            }
+                            //await Task.FromResult(0);
+                        }
+                    };
+                })
                 .AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -143,7 +165,7 @@ namespace NC_Monitoring
                     {
                         cfg.SaveToken = true;
                         cfg.RequireHttpsMetadata = false; // https off                                                
-                        cfg.RequireHttpsMetadata = false;                        
+                        cfg.RequireHttpsMetadata = false;
                         cfg.TokenValidationParameters = new TokenValidationParameters
                         {
                             //ValidateIssuerSigningKey = true,
@@ -153,7 +175,7 @@ namespace NC_Monitoring
 
                             RequireExpirationTime = true,
                             ValidateIssuer = true,
-                            ValidateAudience = true,                                                        
+                            ValidateAudience = true,
                             ValidIssuer = JWTAudience,
                             ValidAudience = JWTIssuer,
                             IssuerSigningKey = new SymmetricSecurityKey(key),
