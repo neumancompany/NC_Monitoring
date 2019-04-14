@@ -58,11 +58,11 @@ namespace NC_Monitoring
             services
                 .AddMvc(config =>
                {//vyzadani globalni autorizace na vsech strankach, ktere nemaji atribut [AllowAnonymous]
-                   //var defaultPolicy = new AuthorizationPolicyBuilder(new[] { JwtBearerDefaults.AuthenticationScheme, IdentityConstants.ApplicationScheme })
-                   //      .RequireAuthenticatedUser()
-                   //      .Build();
+                   var defaultPolicy = new AuthorizationPolicyBuilder(new[] { JwtBearerDefaults.AuthenticationScheme, IdentityConstants.ApplicationScheme })
+                         .RequireAuthenticatedUser()
+                         .Build();
 
-                   //config.Filters.Add(new AuthorizeFilter(defaultPolicy));
+                   config.Filters.Add(new AuthorizeFilter(defaultPolicy));
                    //config.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                })
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
@@ -114,16 +114,16 @@ namespace NC_Monitoring
 
             var key = Encoding.ASCII.GetBytes(SECRET);
 
-            services
-                .AddAuthorization(config =>
-                {
-                    var defaultPolicy = new AuthorizationPolicyBuilder(new[] { JwtBearerDefaults.AuthenticationScheme, IdentityConstants.ApplicationScheme })
-                          .RequireAuthenticatedUser()
-                          .Build();
+            services                
+                //.AddAuthorization(config =>
+                //{
+                //    var defaultPolicy = new AuthorizationPolicyBuilder(new[] { JwtBearerDefaults.AuthenticationScheme, IdentityConstants.ApplicationScheme })
+                //          .RequireAuthenticatedUser()
+                //          .Build();
 
-                    //config.Filters.Add(new AuthorizeFilter(defaultPolicy));
-                    config.DefaultPolicy = defaultPolicy;
-                })
+                //    //config.Filters.Add(new AuthorizeFilter(defaultPolicy));
+                //    config.DefaultPolicy = defaultPolicy;
+                //})
                 .AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

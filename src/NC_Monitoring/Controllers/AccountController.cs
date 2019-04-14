@@ -87,7 +87,7 @@ namespace NC_Monitoring.Controllers
 
                 if (user != null)
                 {
-                    var result = await signInManager.PasswordSignInAsync(user, password, false, true);
+                    var result = await signInManager.PasswordSignInAsync(user, password, false, false);
 
                     var tokenHandler = new JwtSecurityTokenHandler();
                     var key = Encoding.ASCII.GetBytes(Startup.SECRET);
