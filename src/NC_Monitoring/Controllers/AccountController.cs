@@ -92,14 +92,13 @@ namespace NC_Monitoring.Controllers
                     var tokenHandler = new JwtSecurityTokenHandler();
                     var key = Encoding.ASCII.GetBytes(Startup.SECRET);
 
+                    var claims = await userManager.GetClaimsAsync(user);
+
                     var tokenDescriptor = new SecurityTokenDescriptor
                     {
                         Issuer = Startup.JWTIssuer,
                         Audience = Startup.JWTAudience,
-                        Subject = new ClaimsIdentity(new Claim[]
-                        {
-                            new Claim(ClaimTypes.Name, user.Id.ToString())
-                        }),
+                        Subject = new ClaimsIdentity(claims),
                         Expires = DateTime.UtcNow.AddDays(7),
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                     };
