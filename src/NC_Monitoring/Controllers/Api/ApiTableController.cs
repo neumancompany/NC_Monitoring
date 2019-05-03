@@ -26,7 +26,7 @@ namespace NC_Monitoring.Controllers.Api
             this.mapper = mapper;
         }
 
-        [HttpGet("load")]        
+        [HttpGet("load")]
         public virtual ActionResult<List<TFormViewModel>> Load()
         {
             //return DataSourceLoader.Load(mapper.Map<IEnumerable<TEntity>, IEnumerable<TViewModel>>(repository.GetAll()), loadOptions);
@@ -49,6 +49,8 @@ namespace NC_Monitoring.Controllers.Api
 
             await repository.InsertAsync(entity);
 
+            mapper.Map(entity, viewModel);
+
             return Ok(viewModel);
         }
 
@@ -67,6 +69,8 @@ namespace NC_Monitoring.Controllers.Api
             mapper.Map(viewModel, entity);
 
             await repository.UpdateAsync(entity);
+
+            mapper.Map(entity, viewModel);
 
             return Ok(viewModel);
         }
