@@ -59,6 +59,12 @@ namespace NC_Monitoring.Controllers.Api
         public virtual async Task<IActionResult> Put(TKey key, string values)
         {
             TEntity entity = repository.FindById(key);
+
+            if (entity == null)
+            {
+                return BadRequest("Monitor not found.");
+            }
+
             TFormViewModel viewModel;
 
             if (!this.TryValidateViewModelAndPopulate<TFormViewModel>(values, entity, mapper, out viewModel))
