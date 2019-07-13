@@ -8,6 +8,7 @@ using NC_Monitoring.Data.Enums;
 using NC_Monitoring.Data.Models;
 using NC_Monitoring.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -92,7 +93,16 @@ namespace NC_Monitoring.Controllers
                     var tokenHandler = new JwtSecurityTokenHandler();
                     var key = Encoding.ASCII.GetBytes(Startup.SECRET);
 
-                    var claims = await userManager.GetClaimsAsync(user);
+                    //var claims = await userManager.GetClaimsAsync(user);
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, user.Id.ToString()),
+                    };
+
+                    foreach (var role in await userManager.GetRolesAsync(user))
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, role));
+                    }
 
                     var tokenDescriptor = new SecurityTokenDescriptor
                     {
