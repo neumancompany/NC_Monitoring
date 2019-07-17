@@ -43,6 +43,10 @@ namespace NC_Monitoring.Mapper
 
             cfg.CreateMap<ApplicationUser, UserViewModel>()
                 .ForMember(s => s.RoleName, m => m.Ignore());
+
+            cfg.CreateMap<NcMonitorMethodType, MonitorMethodTypeDTO>();
+
+            cfg.CreateMap<NcMonitorVerificationType, MonitorVerificationTypeDTO>();
         }
 
         private static void MapSelectItem<TSource, TKey>(this IMapperConfigurationExpression mapper, Expression<Func<TSource, TKey>> value, Expression<Func<TSource, string>> text)

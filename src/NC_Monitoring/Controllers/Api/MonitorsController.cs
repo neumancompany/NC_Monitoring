@@ -21,7 +21,7 @@ using System.Linq.Expressions;
 
 namespace NC_Monitoring.Controllers.Api
 {
-    //[Route("/api/monitors")]    
+    //[Route("/api/monitors")]
     public class MonitorsController : ApiTableController<NcMonitor, MonitorFormViewModel, Guid>
     {
         protected new readonly IMonitorRepository repository;
@@ -33,6 +33,20 @@ namespace NC_Monitoring.Controllers.Api
             this.repository = repository;
             this.monitorManager = monitorManager;
 
+        }
+
+        [HttpGet]
+        [Route("methods")]
+        public object GetMethodTypes()
+        {
+            return mapper.MapEnumerable<NcMonitorMethodType, MonitorMethodTypeDTO>(repository.GetMethodTypes());
+        }
+
+        [HttpGet]
+        [Route("verifications")]
+        public IActionResult GetVerificationTypes()
+        {
+            return Ok(mapper.MapEnumerable<MonitorVerificationTypeDTO>(repository.GetVerificationTypes()).ToList());
         }
 
         [HttpGet("MethodTypesSelectList")]
