@@ -62,7 +62,7 @@ namespace NC_Monitoring.Controllers.Api
 
             if (entity == null)
             {
-                return BadRequest("Monitor not found.");
+                return BadRequest($"Entity '{key}' not found.");
             }
 
             TFormViewModel viewModel;
