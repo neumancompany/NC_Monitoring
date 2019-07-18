@@ -78,17 +78,21 @@ namespace NC_Monitoring.Controllers.Api
         #region "Records"
 
         [Route("/api/records/load")]
-        public LoadResult RecordsLoad(DataSourceLoadOptions loadOptions)
+        public IActionResult RecordsLoad(DataSourceLoadOptions loadOptions)
         {
-            return DataSourceLoader.Load(mapper.MapQueryable<MonitorRecordListDTO>(monitorManager.GetAllRecords().OrderByDescending(x => x.StartDate)), loadOptions);
+            return Ok(DataSourceLoader.Load(mapper.MapQueryable<MonitorRecordListDTO>(
+                monitorManager
+                    .GetAllRecords()
+                    .OrderByDescending(x => x.StartDate)),
+                loadOptions).data);
         }
 
         [Route("/api/records/ForMonitorLoad", Name = "RecordsForMonitorLoad")]
-        public IEnumerable<MonitorRecordListDTO> RecordsForMonitorLoad(Guid monitorId)
+        public IActionResult RecordsForMonitorLoad(Guid monitorId, DataSourceLoadOptionsBase options)
         {
-            return mapper.MapEnumerable<NcMonitorRecord, MonitorRecordListDTO>(monitorManager
+            return Ok(DataSourceLoader.Load(mapper.MapQueryable<NcMonitorRecord, MonitorRecordListDTO>(monitorManager
                 .GetRecordsForMonitor(monitorId)
-                .OrderByDescending(x=>x.StartDate));
+                .OrderByDescending(x => x.StartDate)), options).data);
         }
 
 
