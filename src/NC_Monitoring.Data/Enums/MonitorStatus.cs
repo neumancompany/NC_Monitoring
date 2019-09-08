@@ -11,8 +11,8 @@ namespace NC_Monitoring.Data.Enums
     /// </summary>
     public enum MonitorStatus
     {
-        OK = 1,
-        InActive = 2,
+        InActive = 1,
+        OK = 2,
         Error = 3,
     }
 }
