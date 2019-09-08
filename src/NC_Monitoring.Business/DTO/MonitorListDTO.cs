@@ -11,6 +11,7 @@ namespace NC_Monitoring.Business.DTO
         public Guid Id { get; set; }
         public string Name { get; set; }
         public int ScenarioId { get; set; }
+        public int StatusId { get; set; }
         public string StatusName { get; set; }
         public bool Enabled { get; set; }
         public int MethodTypeId { get; set; }

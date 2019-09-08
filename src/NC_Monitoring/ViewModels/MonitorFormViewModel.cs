@@ -16,6 +16,7 @@ namespace NC_Monitoring.ViewModels
         [StringLength(50)]
         public string Name { get; set; }
 
+        public int StatusId { get; set; }
         public string StatusName { get; set; }
 
         [Required]

@@ -49,6 +49,23 @@ namespace NC_Monitoring.Controllers.Api
             return Ok(mapper.MapEnumerable<MonitorVerificationTypeDTO>(repository.GetVerificationTypes()).ToList());
         }
 
+        public class MonitorStatusOutput
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        [HttpGet]
+        [Route("statuses")]
+        public List<MonitorStatusOutput> LoadStatuses()
+        {
+            return repository.GetStatusTypes().Select(x=> new MonitorStatusOutput
+            {
+                Id = x.Id,
+                Name = x.Name,
+            }).ToList();
+        }
+
         [HttpGet("MethodTypesSelectList")]
         public LoadResult MethodTypesSelectList(DataSourceLoadOptions loadOptions)
         {
