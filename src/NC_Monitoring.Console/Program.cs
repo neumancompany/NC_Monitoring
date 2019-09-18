@@ -22,6 +22,9 @@ using NC_Monitoring.Business.Classes;
 using System.Net.Mail;
 using System.Net;
 using AutoMapper;
+using NC_Monitoring.ConsoleApp.WindowsService;
+using System.Diagnostics;
+using System.Linq;
 
 namespace NC_Monitoring.ConsoleApp
 {
@@ -90,37 +93,29 @@ namespace NC_Monitoring.ConsoleApp
             });
         }
 
-        private static void Main(string[] args)
+        // In program.cs - c#7 async
+        static async Task Main(string[] args)
         {
-            // .NET Core sets the source directory as the working directory - so change that:
-            Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+            // Run with console or service
+            var asService = !(Debugger.IsAttached || args.Contains("--console"));
 
-            IServiceCollection services = new ServiceCollection();
-            ConfigureServices(services);
-
-            serviceProvider = services.BuildServiceProvider();
-
-            CultureInfo culture = CultureInfo.CreateSpecificCulture("cs-CZ");
-
-            CultureInfo.DefaultThreadCurrentCulture = culture;
-            CultureInfo.DefaultThreadCurrentUICulture = culture;
-
-            //Program program = new Program(args);
-            var config = new JobHostConfiguration();
-            if (config.IsDevelopment)
+            var builder = new HostBuilder()
+            .ConfigureServices((hostContext, services) =>
             {
-                config.UseDevelopmentSettings();
+                ConfigureServices(services);
+                services.AddHostedService<MonitoringService>();
+            });
+            builder.UseEnvironment(asService ? EnvironmentName.Production :
+            EnvironmentName.Development);
+
+            if (asService)
+            {
+                await builder.RunAsServiceAsync();
             }
-
-            config.Queues.MaxPollingInterval = TimeSpan.FromSeconds(10);
-            config.Queues.VisibilityTimeout = TimeSpan.FromMinutes(1);
-            config.Queues.BatchSize = 1;
-            config.JobActivator = new JobActivator(serviceProvider);
-            config.UseTimers();
-
-            var host = new JobHost(config);
-            // The following code ensures that the WebJob will be running continuously
-            host.RunAndBlock();
+            else
+            {
+                await builder.RunConsoleAsync();
+            }
         }
 
         private static void AddWebJobsCommonServices(IConfiguration configuration)

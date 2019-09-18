@@ -46,7 +46,7 @@ namespace NC_Monitoring.ConsoleApp.WebJobs
 
                 logger.LogInformation(msg);
 
-                monitoring.CheckMonitors(serviceProvider);
+                //monitoring.CheckMonitors(serviceProvider);
 
                 await notificator.SendAllNotifications();
             }
