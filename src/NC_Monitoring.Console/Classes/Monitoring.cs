@@ -4,7 +4,6 @@ using NC_Monitoring.Business.Interfaces;
 using NC_Monitoring.Data.Enums;
 using NC_Monitoring.Data.Extensions;
 using NC_Monitoring.Data.Models;
-using NC_Monitoring.ConsoleApp.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,65 +21,78 @@ namespace NC_Monitoring.ConsoleApp.Classes
         private readonly IMonitorRecorder monitorRecorder;
         private readonly IMonitorManager monitorManager;
         private readonly INotificator notificator;
+        private readonly IEmailNotificator emailNotificator;
 
-        public Monitoring(ILogger<Monitoring> logger, IMonitorRecorder monitorRecorder, IMonitorManager monitorManager, INotificator notificator)
+        public Monitoring(ILogger<Monitoring> logger, IMonitorRecorder monitorRecorder, IMonitorManager monitorManager, INotificator notificator, IEmailNotificator emailNotificator)
         {
             this.logger = logger;
             this.monitorRecorder = monitorRecorder;
             this.monitorManager = monitorManager;
             this.notificator = notificator;
+            this.emailNotificator = emailNotificator;
         }
 
         public Task CheckMonitors(IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
-            List<NcMonitor> monitorsToCheck = monitorManager.MonitorsToCheck();
-
             return Task.Run(() =>
             {
-                foreach (NcMonitor monitor in monitorsToCheck)
+                try
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
+                    List<NcMonitor> monitorsToCheck = monitorManager.MonitorsToCheck();
 
-                    try
+                    foreach (NcMonitor monitor in monitorsToCheck)
                     {
-                        Task task = Task.Run(async () =>
-                        {//kontroly jednotlivych monitoru spustime paralelne
-                            try
-                            {
-                                //vytvoreni noveho scope, jelikoz kazde vlakno by melo mit vlastni scope
-                                //muze se totiz stat, ze se napr. databazovi context uvolni
-                                //a vlakno se na nej bude chtit stale dotazovat
-                                using (IServiceScope scope = serviceProvider.CreateScope())
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        try
+                        {
+                            Task task = Task.Run(async () =>
+                            {//kontroly jednotlivych monitoru spustime paralelne
+                                try
                                 {
-                                    cancellationToken.ThrowIfCancellationRequested();
+                                    //vytvoreni noveho scope, jelikoz kazde vlakno by melo mit vlastni scope
+                                    //muze se totiz stat, ze se napr. databazovi context uvolni
+                                    //a vlakno se na nej bude chtit stale dotazovat
+                                    using (IServiceScope scope = serviceProvider.CreateScope())
+                                    {
+                                        cancellationToken.ThrowIfCancellationRequested();
 
-                                    Monitoring monitoring = scope.ServiceProvider.GetService<Monitoring>();
+                                        Monitoring monitoring = scope.ServiceProvider.GetService<Monitoring>();
 
-                                    //vyhledani monitoru v aktualnim scope (db contextu)
-                                    NcMonitor tmpMonitor = monitoring.monitorManager.FindMonitor(monitor.Id);
-                                    logger.LogInformation($"{tmpMonitor.Name}: Started monitor checking.");
-                                    await monitoring.CheckAndRecordMonitorAsync(tmpMonitor);
-                                    logger.LogInformation($"{tmpMonitor.Name}: Finished monitor checking.");
+                                        //vyhledani monitoru v aktualnim scope (db contextu)
+                                        NcMonitor tmpMonitor = monitoring.monitorManager.FindMonitor(monitor.Id);
+                                        logger.LogInformation($"{tmpMonitor.Name}: Started monitor checking.");
+                                        await monitoring.CheckAndRecordMonitorAsync(tmpMonitor);
+                                        logger.LogInformation($"{tmpMonitor.Name}: Finished monitor checking.");
 
-                                    cancellationToken.ThrowIfCancellationRequested();
+                                        cancellationToken.ThrowIfCancellationRequested();
 
-                                    logger.LogInformation($"{tmpMonitor.Name}: Started send all notifications...");
-                                    await monitoring.notificator.SendAllNotifications();
-                                    logger.LogInformation($"{tmpMonitor.Name}: Finished send all notifications...");
+                                        logger.LogInformation($"{tmpMonitor.Name}: Started send all notifications...");
+                                        await monitoring.notificator.SendAllNotifications();
+                                        logger.LogInformation($"{tmpMonitor.Name}: Finished send all notifications...");
+                                    }
                                 }
-                            }
-                            catch (Exception ex)
-                            {
-                                logger.LogError(ex, $"Error while checking monitor: {monitor.Id} - {monitor.Name}.");
-                            }
+                                catch (Exception ex)
+                                {
+                                    logger.LogError(ex, $"Error while checking monitor: {monitor.Id} - {monitor.Name}.");
+                                    await emailNotificator.SendEmailExceptionAsync(ex, $"Error while checking monitor: {monitor.Id} - {monitor.Name}.");
+                                }
 
-                        }, cancellationToken);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, $"Error while creating and starting task to check monitor: {monitor.Id} - {monitor.Name}.");
+                            }, cancellationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, $"Error while creating and starting task to check monitor: {monitor.Id} - {monitor.Name}.");
+                            emailNotificator.SendEmailExceptionAsync(ex, $"Error while creating and starting task to check monitor: {monitor.Id} - {monitor.Name}.");
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, $"{nameof(CheckMonitors)}");
+                    emailNotificator.SendEmailExceptionAsync(ex, $"{nameof(CheckMonitors)}");
+                }
+
             }, cancellationToken);
         }
 
