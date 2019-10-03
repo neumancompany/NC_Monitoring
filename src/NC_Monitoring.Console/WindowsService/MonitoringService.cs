@@ -19,8 +19,6 @@ namespace NC_Monitoring.ConsoleApp.WindowsService
         private readonly IServiceProvider services;
         private readonly IConfiguration configuration;
 
-        private string NotificationEmailOnError => configuration.GetSection("ConsoleApp:NotificationEmailOnError").Get<string>();
-
         private int MonitoringIntervalMilliseconds
         {
             get
@@ -47,7 +45,7 @@ namespace NC_Monitoring.ConsoleApp.WindowsService
             this.configuration = configuration;
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public override async Task StartAsync(CancellationToken cancellationToken)
         {
             logger.LogInformation($"[{nameof(MonitoringService)}] has been started.....");
         }
@@ -79,24 +77,14 @@ namespace NC_Monitoring.ConsoleApp.WindowsService
             }
             catch (Exception ex)
             {
-                string email = NotificationEmailOnError;
-                if (email != null)
-                {
-                    await emailNotificator.SendEmailAsync(email, "!!! MONITORING SERVICE DOWN !!!", "Console application to monitoring websites is down."
-                        + $"{Environment.NewLine}Exception:{Environment.NewLine}" + ex.ToString());
-                }
+                await emailNotificator.SendEmailExceptionAsync(ex, "Console application to monitoring websites is down.");
             }
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public override async Task StopAsync(CancellationToken cancellationToken)
         {
             logger.LogInformation($"[{nameof(MonitoringService)}] has been stopped.....");
-
-            string email = NotificationEmailOnError;
-            if (email != null)
-            {
-                await emailNotificator.SendEmailAsync(email, "!!! MONITORING SERVICE STOPPED !!!", "Console application to monitoring websites is down.");
-            }
+            await emailNotificator.SendEmailErrorAsync("Console application to monitoring websites is stopped.");
         }
 
         public override void Dispose()
