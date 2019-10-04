@@ -1,0 +1,3 @@
+[submodule "src/NC"]
+	path = src/NC
+	url = https://github.com/neumancompany/NC
