@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NC_Monitoring.ConsoleApp", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NC_Monitoring.Test", "NC_Monitoring.xUnitTest\NC_Monitoring.Test.csproj", "{4C9CE5EA-F915-40D8-AAAD-03C29443FE54}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NC", "NC\NC.csproj", "{1E1ADE1F-B724-42EB-A84F-59923D3BD294}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{4C9CE5EA-F915-40D8-AAAD-03C29443FE54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C9CE5EA-F915-40D8-AAAD-03C29443FE54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C9CE5EA-F915-40D8-AAAD-03C29443FE54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E1ADE1F-B724-42EB-A84F-59923D3BD294}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E1ADE1F-B724-42EB-A84F-59923D3BD294}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E1ADE1F-B724-42EB-A84F-59923D3BD294}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E1ADE1F-B724-42EB-A84F-59923D3BD294}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
