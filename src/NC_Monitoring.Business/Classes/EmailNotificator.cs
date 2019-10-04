@@ -21,6 +21,9 @@ namespace NC_Monitoring.Business.Classes
         private readonly string notificationEmailOnError;
         private readonly string addressFrom;
 
+        private readonly string machineName = Environment.MachineName;
+        private readonly string userName = Environment.UserName;
+
         public EmailNotificator(SmtpClient smtpClient, ILogger<EmailNotificator> logger, IConfiguration configuration)
         {
             this.smtpClient = smtpClient;
@@ -42,7 +45,7 @@ namespace NC_Monitoring.Business.Classes
                 throw new ArgumentNullException($"{nameof(emailTo)} cant be null.");
             }
 
-            using (var mailMsg = new MailMessage() { From = new MailAddress(addressFrom), Subject = subject, Body = message, })
+            using (var mailMsg = new MailMessage() { From = new MailAddress(addressFrom), Subject = $"{machineName}: {subject}", Body = message, })
             {
                 foreach (string email in emailTo.Split(';').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)))
                 {
@@ -70,6 +73,9 @@ namespace NC_Monitoring.Business.Classes
             if (!string.IsNullOrWhiteSpace(email))
             {
                 List<string> emailMessageLines = new List<string>();
+
+                emailMessageLines.Add($"MachineName: {machineName}");
+                emailMessageLines.Add($"UserName: {userName}");
 
                 emailMessageLines.Add(message);
 
