@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using NC_Monitoring.Data.Extensions;
+using NC.Extensions;
+using NC_Monitoring.Data.Enums;
 using NC_Monitoring.Data.Interfaces;
 using NC_Monitoring.Data.Models;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace NC_Monitoring.Data.Repositories
@@ -32,29 +33,57 @@ namespace NC_Monitoring.Data.Repositories
 
         private async Task UpdateInternalAsync(NcMonitor entity, bool resetTestCycleIfChangeStatus)
         {
+            context.Entry(entity).State = EntityState.Detached;
+
             var foundEntity = await dbSet.FindAsync(entity.Id);
+            bool change = false;
+
+            if (foundEntity.StatusId == (int)MonitorStatus.InActive)
+            {
+                entity.StatusId = (int)MonitorStatus.InActive;
+            }
 
             if (resetTestCycleIfChangeStatus && foundEntity != null)
             {
                 if (foundEntity.StatusId != entity.StatusId)
                 {//zmena statusu
                     entity.LastTestCycleInterval = null;
+                    change = true;
                 }
             }
 
-            //mapper.Map(entity, foundEntity);
+            var allowValues = new Expression<Func<NcMonitor, object>>[]
+            {
+                x=>x.StatusId,
+                x=>x.MethodTypeId,
+                x=>x.Url,
+                x=>x.VerificationTypeId,
+                x=>x.VerificationValue,
+                x=>x.ScenarioId,
+                x=>x.LastTestCycleInterval,
+            }.Select(x=>x.GetPropertyName());
 
-            foundEntity.MethodTypeId = entity.MethodTypeId;
-            foundEntity.StatusId = entity.StatusId;
-            foundEntity.ScenarioId = entity.ScenarioId;
-            foundEntity.VerificationTypeId = entity.VerificationTypeId;
-            foundEntity.VerificationValue = entity.VerificationValue;
-            foundEntity.Name = entity.Name;
-            foundEntity.Timeout = entity.Timeout;
-            foundEntity.Url = entity.Url;
-            foundEntity.LastTestCycleInterval = entity.LastTestCycleInterval;
+            foreach (var propInfo in foundEntity.GetType().GetProperties().Where(x => allowValues.Contains(x.Name)))
+            {
+                object oldValue = propInfo.GetValue(foundEntity);
+                object newValue = propInfo.GetValue(entity);
 
-            await base.UpdateAsync(foundEntity);
+                if (oldValue == null && newValue == null)
+                {
+                    continue;
+                }
+
+                if (!Equals(oldValue, newValue))
+                {
+                    propInfo.SetValue(foundEntity, newValue);
+                    change = true;
+                }
+            }
+
+            if (change)
+            {
+                await base.UpdateAsync(foundEntity);
+            }
         }
 
         public List<NcMonitorMethodType> GetMethodTypes()
