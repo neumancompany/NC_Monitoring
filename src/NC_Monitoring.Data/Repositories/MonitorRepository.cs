@@ -38,11 +38,6 @@ namespace NC_Monitoring.Data.Repositories
             var foundEntity = await dbSet.FindAsync(entity.Id);
             bool change = false;
 
-            if (foundEntity.StatusId == (int)MonitorStatus.InActive)
-            {
-                entity.StatusId = (int)MonitorStatus.InActive;
-            }
-
             if (resetTestCycleIfChangeStatus && foundEntity != null)
             {
                 if (foundEntity.StatusId != entity.StatusId)

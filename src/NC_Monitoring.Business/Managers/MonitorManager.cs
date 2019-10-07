@@ -38,7 +38,7 @@ namespace NC_Monitoring.Business.Managers
             return channelRepository.GetSubscribersByChannel(channelId)
                         .Select(x => x.User).ToList();
         }
-        
+
 
         public NcMonitor FindMonitor(Guid id)
         {
@@ -52,7 +52,11 @@ namespace NC_Monitoring.Business.Managers
 
         public async Task SetStatusAndResetLastTestCycleIntervalAsync(NcMonitor monitor, MonitorStatus status)
         {
-            monitor.StatusId = (int)status;
+            if (monitor.StatusEnum() != MonitorStatus.InActive)
+            {
+                monitor.StatusId = (int)status;
+            }
+
             monitor.LastTestCycleInterval = null;
             await monitorRepository.UpdateAsync(monitor);
         }
