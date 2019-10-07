@@ -272,6 +272,7 @@ __pycache__/
 
 # Monitoring
 *.development.json
+appsettings.*.json
 DockerFile
 .dockerignore
 **/*/wwwroot/lib
