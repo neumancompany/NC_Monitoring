@@ -33,6 +33,9 @@ namespace NC_Monitoring.ConsoleApp.WindowsService
             }
         }
 
+        private bool _stopping;
+        private Task _backgroundTask;
+
         public MonitoringService(Monitoring monitoring, INotificator notificator,
             IEmailNotificator emailNotificator, ILogger<MonitoringService> logger, IServiceProvider services,
             IConfiguration configuration)
@@ -45,16 +48,19 @@ namespace NC_Monitoring.ConsoleApp.WindowsService
             this.configuration = configuration;
         }
 
-        public override async Task StartAsync(CancellationToken cancellationToken)
+        public override Task StartAsync(CancellationToken cancellationToken)
         {
             logger.LogInformation($"[{nameof(MonitoringService)}] has been started.....");
+            _backgroundTask = ExecuteAsync(cancellationToken);
+
+            return Task.CompletedTask;
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             try
             {
-                while (!cancellationToken.IsCancellationRequested)
+                while (!_stopping && !cancellationToken.IsCancellationRequested)
                 {
                     monitoring.CheckMonitors(services, cancellationToken);
 
@@ -84,6 +90,7 @@ namespace NC_Monitoring.ConsoleApp.WindowsService
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             logger.LogInformation($"[{nameof(MonitoringService)}] has been stopped.....");
+            _stopping = true;
             await emailNotificator.SendEmailErrorAsync("Console application to monitoring websites is stopped.");
         }
 
