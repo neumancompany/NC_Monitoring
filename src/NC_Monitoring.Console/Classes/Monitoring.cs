@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NC_Monitoring.Business.Interfaces;
+using NC_Monitoring.ConsoleApp.Interfaces;
 using NC_Monitoring.Data.Enums;
 using NC_Monitoring.Data.Extensions;
 using NC_Monitoring.Data.Models;
@@ -9,9 +11,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
-using NC_Monitoring.ConsoleApp.Interfaces;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace NC_Monitoring.ConsoleApp.Classes
 {
@@ -68,7 +69,17 @@ namespace NC_Monitoring.ConsoleApp.Classes
                                         cancellationToken.ThrowIfCancellationRequested();
 
                                         logger.LogInformation($"{tmpMonitor.Name}: Started send all notifications...");
-                                        await monitoring.notificator.SendAllNotifications();
+
+                                        bool saved = false;
+                                        while (!saved)
+                                        {
+                                            try
+                                            {
+                                                await monitoring.notificator.SendAllNotifications();
+                                                saved = true;
+                                            }
+                                            catch (DbUpdateConcurrencyException ex) {}
+                                        }
                                         logger.LogInformation($"{tmpMonitor.Name}: Finished send all notifications...");
                                     }
                                 }
