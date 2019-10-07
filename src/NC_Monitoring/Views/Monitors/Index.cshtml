@@ -23,20 +23,31 @@
                     .DeleteAction("Delete")
                     .Key("Id"))
                 .OnInitNewRow("initNewRow")
+                .Paging(opts =>
+                {
+                    opts.PageSize(20);
+                })
                 .Editing(e=>e.AllowEditingByUser(User))
                 .Columns(col =>
                 {
-                    col.AddFor(m => m.Name).CellTemplate(@Html.DxActionLink("<%= data.Name %>", "Details", new { Id = "<%= data.Id %>" }));
+                    col.AddFor(m => m.Name)
+                        .SortIndex(1)
+                        .SortOrder(SortOrder.Asc)
+                        .CellTemplate(@Html.DxActionLink("<%= data.Name %>", "Details", new { Id = "<%= data.Id %>" }));
 
                     col.AddFor(m => m.ScenarioId)
                         .Lookup(look => look.ApplySelectList<ScenariosController>())
                         .CellTemplate(
                             Html.DxActionLink("<%= text %>", "Details", "Scenarios", new { Id = "<%= value %>" }));
 
+                    col.AddFor(x => x.StatusId)
+                        .SortIndex(0)
+                        .SortOrder(SortOrder.Desc)
+                        .FormItem(opts => opts.Visible(false))
+                        .Visible(false);
 
                     col.AddFor(m => m.StatusName)
-                        .FormItem(conf=>conf.Visible(false))
-                        ;
+                        .FormItem(conf=>conf.Visible(false));
 
                     col.AddFor(m => m.Enabled)
                         .Visible(false);
