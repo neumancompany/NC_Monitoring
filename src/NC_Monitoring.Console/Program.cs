@@ -31,7 +31,7 @@ namespace NC_Monitoring.ConsoleApp
     internal class Program
     {
         //private static ILogger<Program> logger;
-        private static IServiceProvider serviceProvider;
+        //private static IServiceProvider serviceProvider;
 
         private static void ConfigureServices(IServiceCollection services)
         {
